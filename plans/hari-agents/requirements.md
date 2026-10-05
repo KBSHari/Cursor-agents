@@ -1,12 +1,12 @@
 # Requirements: Hari-Agents welcome page
 
 **Status:** Approved (for implementation)
-**Source:** Requirement analysis, 2026-10-05 (Hari-Agents welcome page)
+**Source:** Requirement analysis, 2026-10-05 (Hari-Agents welcome page); additive analysis 2026-10-05 (year and QA instruction)
 **Location:** `plans/hari-agents/` — do not confuse with repo-root `requirements.md` (`US-LOGO-1` logo/PWA draft)
 
 ## Summary
 
-One static welcome/landing page that presents the Hari-Agents identity. Opening the page in a browser (no login, no API) shows the product title, a greeting, and a personal-workspace branding line.
+One static welcome/landing page that presents the Hari-Agents identity. Opening the page in a browser (no login, no API) shows the product title, a greeting, a personal-workspace branding line, the year `2026`, and the instruction `Page used for QA engineer`.
 
 ## Functional requirements
 
@@ -22,6 +22,10 @@ One static welcome/landing page that presents the Hari-Agents identity. Opening 
 - **FR-10:** Visible text on the default background shall remain readable (see NFR-1).
 - **FR-11:** The same welcome content shall remain readable at about 1280×800 and about 375×667; horizontal overflow that clips the heading or greeting is not acceptable.
 - **FR-12:** The product name `Hari-Agents` shall remain visible as text so identity does not depend on an image load.
+- **FR-13:** The page shall show the year `2026` at least once as visible rendered text. The four digits shall be a year token and must not be only part of a longer digit run (for example `20260` does not satisfy this). A comment, hidden attribute, or document-only metadata date does not satisfy this.
+- **FR-14:** The page shall show the instruction `Page used for QA engineer` at least once as visible rendered text. The match is case-sensitive and character-exact. A trailing space after `engineer` is not required. A reworded sentence (including a plural `engineers`) does not satisfy this.
+- **FR-15:** FR-13 and FR-14 shall be true after a normal page load, with no click, form submit, or application API call.
+- **FR-16:** The page shall still show document title exactly `Hari-Agents`, exactly one `h1` whose text is `Hari-Agents`, greeting `Welcome to Hari-Agents`, and tagline `A personal agent workspace.`
 
 ## Non-functional requirements
 
@@ -43,7 +47,25 @@ One static welcome/landing page that presents the Hari-Agents identity. Opening 
 - **AC-FR-10.1:** Given the default theme, when contrast of heading and greeting text is checked against the background, then the ratios meet NFR-1.
 - **AC-FR-11.1:** Given a viewport of about 375×667, when the page loads, then the heading and greeting remain fully readable and are not clipped by horizontal overflow.
 - **AC-FR-12.1:** Given any decorative image is blocked or missing, when the page renders, then the text `Hari-Agents` remains visible and no broken-image icon is the only identifier.
+- **AC-FR-13.1:** Given the welcome page is opened in a browser, when the page has finished loading, then visible text includes the year token `2026`.
+- **AC-FR-13.2:** Given the page is rendered, when `2026` appears only inside an HTML comment, a non-visible attribute, or a longer digit sequence, then FR-13 is not met.
+- **AC-FR-14.1:** Given the welcome page is visible, when a user reads the page, then the exact text `Page used for QA engineer` is visible.
+- **AC-FR-14.2:** Given the instruction is displayed, when visible text is compared, then no trailing space after `engineer` is required.
+- **AC-FR-14.3:** Given the page is visible, when the only similar sentence is a corrected variant such as `Page used for QA engineers`, then FR-14 is not met.
+- **AC-FR-15.1:** Given no login session and no application API are running, when the static welcome page is opened, then both `2026` and `Page used for QA engineer` are visible without a click or form submit.
+- **AC-FR-16.1:** Given the updated welcome page is visible, when a user reads it, then the tab title is `Hari-Agents`, the only `h1` is `Hari-Agents`, `Welcome to Hari-Agents` is visible, and `A personal agent workspace.` is visible.
+
+## Assumptions accepted for this change
+
+- **A-1:** Existing FR-1 through FR-12 stay in force. This change is additive.
+- **A-2:** The required visible instruction is `Page used for QA engineer`. A trailing space after `engineer` is not required.
+- **A-3:** Both new strings must be visible on the rendered page, not only in source comments.
+- **A-4:** Any visible placement on this same page meets FR-13 and FR-14. The document title and the only `h1` stay `Hari-Agents`.
+- **A-5:** A visible year token is enough. A copyright sentence is not required.
+- **A-6:** At least one visible occurrence of each new string is enough.
+- **A-7:** The instruction does not create a separate QA-only build or a gated view.
+- **A-8:** The instruction stays singular: `engineer`.
 
 ## Out of scope
 
-Auth, APIs, analytics, in-page Jira, multi-page navigation, agent execution, SPA/frameworks, `US-LOGO-1` logo/PWA/favicon program.
+Auth, APIs, analytics, in-page Jira, multi-page navigation, agent execution, SPA/frameworks, `US-LOGO-1` logo/PWA/favicon program, a second page, forms, and changing the document title to include `2026`.
