@@ -2,10 +2,10 @@
 
 ## Document status
 
-- Status: Needs Review
-- Design review: Pending (not re-run for this revision)
-- Ready for implementation: No
-- Prior review date: 2026-10-05 (FR-1 through FR-12 only; does not cover this revision)
+- Status: Approved
+- Design review: Passed (delta review 2026-10-05 for FR-13 through FR-16)
+- Ready for implementation: Yes
+- Prior review date: 2026-10-05 (FR-1 through FR-12); delta review date: 2026-10-05 (FR-13 through FR-16)
 
 ### Allowed status values
 
@@ -17,7 +17,7 @@
 | Blocked | A finding or missing decision prevents safe progress. |
 | Superseded | Replaced by a later architecture document. |
 
-This document was **Approved** on 2026-10-05 for FR-1 through FR-12. This revision adds architecture for approved additive requirements FR-13 through FR-16 (assumptions A-1 through A-8). Those material changes have not had Design Review. Status is **Needs Review**. Ready for implementation: **No**, until Design Review passes. Production HTML, CSS, and tests are not changed by this document update.
+This document was **Approved** on 2026-10-05 for FR-1 through FR-12. This revision adds architecture for approved additive requirements FR-13 through FR-16 (assumptions A-1 through A-8). Design Review of that revision passed on 2026-10-05. Status is **Approved**. Ready for implementation: **Yes**. Production HTML, CSS, and tests are not changed by this document update. Implementation planning is the next stage; this approval does not start production coding.
 
 ---
 
@@ -453,7 +453,7 @@ Runtime trust boundary is `index.html` and `styles.css`. Crossing it (remote scr
 | OD-6 | Later multi-page workspace (req Q-4) | No | This release is one static page only |
 | OD-7 | First-screen placement of the year and instruction (additive Q-1) | No | Not mandatory. Visible after load is enough (FR-15, AD-16). Place both paragraphs in `main`. |
 
-**Blocking open decisions:** none. Defaults above are sufficient for Design Review of FR-1 through FR-16. Implementation still waits for Design Review to pass.
+**Blocking open decisions:** none. Defaults above are sufficient. Design Review of FR-1 through FR-16 passed on 2026-10-05. Implementation planning may begin. Production edits to `index.html`, `styles.css`, and `welcome-page.test.mjs` still wait for the implementation plan.
 
 ---
 
@@ -516,14 +516,14 @@ Still in force from the prior architecture:
 
 | Item | Value |
 |------|--------|
-| Current stage | Architecture updated for FR-13 through FR-16; awaiting Design Review |
+| Current stage | Architecture approved for FR-1 through FR-16 |
 | Input artifact | Approved requirement analysis (Hari-Agents welcome page, FR-1..FR-16, assumptions A-1..A-8) |
-| Output artifact | `plans/hari-agents/architecture.md` (this file, Needs Review) |
-| Status | Needs Review |
-| Design review | Pending — not re-run for this revision |
-| Ready for implementation | No |
-| Next stage | Design Review |
-| Production coding | Must wait for Design Review and Implementation Planning. This revision does not authorize edits to `index.html`, `styles.css`, or `welcome-page.test.mjs`. |
+| Output artifact | `plans/hari-agents/architecture.md` (this file, Approved) |
+| Status | Approved |
+| Design review | Passed — delta review 2026-10-05 for FR-13 through FR-16 |
+| Ready for implementation | Yes |
+| Next stage | Implementation Planning |
+| Production coding | Must wait for Implementation Planning. This revision does not authorize edits to `index.html`, `styles.css`, or `welcome-page.test.mjs`, and implementation of FR-13 through FR-16 has not started. |
 
 ---
 
@@ -535,9 +535,13 @@ Do not implement as part of this architecture: authentication, APIs, analytics, 
 
 ## 15. Design Review findings (2026-10-05)
 
-The findings in this section record the prior Design Review of the FR-1 through FR-12 architecture. They are historical. They do **not** approve this revision. Design Review has not re-run for FR-13 through FR-16. This document is **Needs Review**. Ready for implementation: **No**.
+The findings F-1 through F-8 record the prior Design Review of the FR-1 through FR-12 architecture. They are historical. That pass did not by itself approve the FR-13 through FR-16 revision. Medium findings below were resolved in that prior revision.
 
-Prior review status (FR-1 through FR-12 only): ready for implementation at that time. Critical/High blockers then: **none**. Medium findings below were resolved in that prior revision.
+Prior review status (FR-1 through FR-12 only): ready for implementation at that time. Critical/High blockers then: **none**.
+
+### Delta review note (2026-10-05)
+
+Design Review re-ran for the FR-13 through FR-16 revision (AD-13 through AD-17, assumptions A-1 through A-8, Q-1 default). No Critical or High findings. Requirements coverage, component boundaries, static data, absence of APIs, security, reliability, and technology choices are consistent. Diagrams match the decisions. Main content order is `h1` Hari-Agents, greeting `Welcome to Hari-Agents`, tagline `A personal agent workspace.`, year `2026`, instruction `Page used for QA engineer`. Status is **Approved**. Design review: **Passed**. Ready for implementation: **Yes**. This note does not start implementation.
 
 | ID | Severity | Category | Finding | Resolution in this document |
 |----|----------|----------|---------|-----------------------------|
@@ -550,4 +554,4 @@ Prior review status (FR-1 through FR-12 only): ready for implementation at that 
 | F-7 | Low | Diagrams | Implementer visual-check path was text-only. | Implementer → Browser added in §2.6. |
 | F-8 | Low | Open decisions | Req Q-4 (later multi-page) was not listed. | OD-6: this release is one static page. |
 
-Low items F-7 and F-8 are documentation-only and do not block the prior approval. They do not approve the FR-13 through FR-16 revision.
+Low items F-7 and F-8 are documentation-only and do not block the prior approval. The 2026-10-05 delta review note above is the approval for the FR-13 through FR-16 revision.

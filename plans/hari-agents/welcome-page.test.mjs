@@ -18,13 +18,26 @@ test('exactly one h1 Hari-Agents', () => {
   assert.equal(headings.length, 1);
 });
 
-test('single main wraps heading greeting and tagline', () => {
+test('single main wraps heading greeting tagline year and instruction', () => {
   const mains = html.match(/<main[\s>]/gi) ?? [];
   assert.equal(mains.length, 1);
   assert.match(
     html,
-    /<main>\s*<h1>Hari-Agents<\/h1>\s*<p>Welcome to Hari-Agents<\/p>\s*<p>A personal agent workspace\.<\/p>\s*<\/main>/
+    /<main>\s*<h1>Hari-Agents<\/h1>\s*<p>Welcome to Hari-Agents<\/p>\s*<p>A personal agent workspace\.<\/p>\s*<p>2026<\/p>\s*<p>Page used for QA engineer<\/p>\s*<\/main>/
   );
+});
+
+test('visible year is the token 2026', () => {
+  const paragraphTexts = [...html.matchAll(/<p>([^<]*)<\/p>/g)].map((match) => match[1]);
+  assert.ok(
+    paragraphTexts.includes('2026'),
+    'expected a paragraph whose text is the year token 2026, not a longer digit run'
+  );
+});
+
+test('exact instruction Page used for QA engineer is present', () => {
+  const paragraphTexts = [...html.matchAll(/<p>([^<]*)<\/p>/g)].map((match) => match[1]);
+  assert.ok(paragraphTexts.includes('Page used for QA engineer'));
 });
 
 test('greeting Welcome to Hari-Agents is present', () => {
