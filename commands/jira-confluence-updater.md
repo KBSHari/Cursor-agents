@@ -23,6 +23,9 @@ Do not delete Jira issues or Confluence pages.
 Do not transition Jira issues unless the user explicitly requests the transition.
 Do not modify source files in the repository unless the user explicitly requests implementation work.
 
+Project Key: SCRUM
+Space: AI Schokwave
+
 ## Required skill
 
 Use the `jira-skills` skill for Jira or Confluence analysis, content preparation, creation, and updates.

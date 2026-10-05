@@ -1,0 +1,10 @@
+---
+pid: 12988
+cwd: |
+  C:\Users\Hariprasanth_Baskara\.cursor
+---
+PS C:\Users\Harigit remote add origin https://github.com/KBSHari/Cursor-agents.git
+PS C:\Users\Hariprasanth_Baskara\.cursor> git remote -v
+origin  https://github.com/KBSHari/Cursor-agents.git (fetch)
+origin  https://github.com/KBSHari/Cursor-agents.git (push)
+PS C:\Users\Hariprasanth_Baskara\.cursor> 

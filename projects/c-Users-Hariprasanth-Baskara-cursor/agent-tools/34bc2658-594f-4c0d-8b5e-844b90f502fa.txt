@@ -1,0 +1,1769 @@
+* 2026-09-29-7bq8
+a480a01 Refine architecture document with updated trust boundaries and design review findings. Clarified the exclusion of third-party scripts and page JavaScript, and specified default color palette. Document now reflects readiness for implementation and includes resolutions for medium findings from the design review.
+39548d5 Refine architecture document with updated trust boundaries and design review findings. Clarified the exclusion of third-party scripts and page JavaScript, and specified default color palette. Document now reflects readiness for implementation and includes resolutions for medium findings from the design review.
+0a25982 Update architecture document to reflect approval status and implementation readiness. The design review has passed, and the document now includes additional details on runtime trust boundaries, verification artifacts, and specific requirements for HTML structure and styling. This revision ensures clarity on the project's implementation guidelines and constraints.
+90c460f Update requirements document to include additional user story details and integration specifications for application logo. This revision enhances clarity on functional and non-functional requirements, ensuring a comprehensive understanding of the visual identity goals.
+3f12a6d Add requirements document for application logo identity and integration
+a480a01 Refine architecture document with updated trust boundaries and design review findings. Clarified the exclusion of third-party scripts and page JavaScript, and specified default color palette. Document now reflects readiness for implementation and includes resolutions for medium findings from the design review.
+ commands/code-review.md                            |  328 +++
+ commands/design-architecture.md                    |  140 ++
+ commands/design-review.md                          |  247 ++
+ commands/implementation-planning.md                |  164 ++
+ commands/implementation.md                         |  277 +++
+ commands/jira-confluence-updater.md                |  156 ++
+ commands/pr-using-agentic-sdlc.md                  |  185 ++
+ commands/requirement-analysis.md                   |  103 +
+ commands/sdlc-orchestrator.md                      |   54 +
+ commands/verify.md                                 |  263 +++
+ .../.cache-complete                                |    0
+ .../.cursor-plugin/plugin.json                     |   45 +
+ .../CHANGELOG.md                                   |    9 +
+ .../LICENSE                                        |   21 +
+ .../README.md                                      |   64 +
+ .../assets/logo.svg                                |    1 +
+ .../mcp.json                                       |   11 +
+ .../mcps/user-Playwright/SERVER_METADATA.json      |    4 +
+ .../mcps/user-Playwright/tools/browser_click.json  |   49 +
+ .../mcps/user-Playwright/tools/browser_close.json  |    8 +
+ .../tools/browser_console_messages.json            |   33 +
+ .../mcps/user-Playwright/tools/browser_drag.json   |   31 +
+ .../mcps/user-Playwright/tools/browser_drop.json   |   39 +
+ .../user-Playwright/tools/browser_evaluate.json    |   30 +
+ .../user-Playwright/tools/browser_file_upload.json |   18 +
+ .../user-Playwright/tools/browser_fill_form.json   |   57 +
+ .../tools/browser_handle_dialog.json               |   22 +
+ .../mcps/user-Playwright/tools/browser_hover.json  |   22 +
+ .../user-Playwright/tools/browser_navigate.json    |   18 +
+ .../tools/browser_navigate_back.json               |    8 +
+ .../tools/browser_network_request.json             |   34 +
+ .../tools/browser_network_requests.json            |   27 +
+ .../user-Playwright/tools/browser_press_key.json   |   18 +
+ .../mcps/user-Playwright/tools/browser_resize.json |   23 +
+ .../tools/browser_run_code_unsafe.json             |   19 +
+ .../tools/browser_select_option.json               |   30 +
+ .../user-Playwright/tools/browser_snapshot.json    |   27 +
+ .../mcps/user-Playwright/tools/browser_tabs.json   |   32 +
+ .../tools/browser_take_screenshot.json             |   49 +
+ .../mcps/user-Playwright/tools/browser_type.json   |   35 +
+ .../user-Playwright/tools/browser_wait_for.json    |   23 +
+ .../mcps/cursor-ide-browser/INSTRUCTIONS.md        |   47 +
+ .../mcps/cursor-ide-browser/SERVER_METADATA.json   |    4 +
+ .../mcps/cursor-ide-browser/tools/browser_cdp.json |   28 +
+ .../cursor-ide-browser/tools/browser_click.json    |   67 +
+ .../cursor-ide-browser/tools/browser_drag.json     |   36 +
+ .../cursor-ide-browser/tools/browser_fill.json     |   33 +
+ .../tools/browser_get_bounding_box.json            |   24 +
+ .../tools/browser_highlight.json                   |   28 +
+ .../cursor-ide-browser/tools/browser_lock.json     |   24 +
+ .../tools/browser_mouse_click_xy.json              |   38 +
+ .../cursor-ide-browser/tools/browser_navigate.json |   36 +
+ .../tools/browser_press_key.json                   |   24 +
+ .../cursor-ide-browser/tools/browser_scroll.json   |   48 +
+ .../tools/browser_select_option.json               |   36 +
+ .../cursor-ide-browser/tools/browser_snapshot.json |   38 +
+ .../cursor-ide-browser/tools/browser_tabs.json     |   34 +
+ .../tools/browser_take_screenshot.json             |   34 +
+ .../cursor-ide-browser/tools/browser_type.json     |   45 +
+ .../mcps/cursor-origin-readonly/INSTRUCTIONS.md    |    1 +
+ .../cursor-origin-readonly/SERVER_METADATA.json    |    4 +
+ .../cursor-origin-readonly/tools/checks_read.json  |   54 +
+ .../cursor-origin-readonly/tools/commit_read.json  |   43 +
+ .../tools/compare_commits.json                     |   33 +
+ .../tools/get_file_contents.json                   |   36 +
+ .../cursor-origin-readonly/tools/get_git_tree.json |   32 +
+ .../tools/get_repository.json                      |   23 +
+ .../tools/grep_contents.json                       |   74 +
+ .../tools/list_branches.json                       |   33 +
+ .../cursor-origin-readonly/tools/list_commits.json |   55 +
+ .../tools/list_namespaces.json                     |   17 +
+ .../tools/list_pull_requests.json                  |   53 +
+ .../tools/list_repositories.json                   |   28 +
+ .../tools/pull_request_read.json                   |   50 +
+ .../mcps/user-Playwright/SERVER_METADATA.json      |    4 +
+ .../mcps/user-Playwright/tools/browser_click.json  |   49 +
+ .../mcps/user-Playwright/tools/browser_close.json  |    8 +
+ .../tools/browser_console_messages.json            |   33 +
+ .../mcps/user-Playwright/tools/browser_drag.json   |   31 +
+ .../mcps/user-Playwright/tools/browser_drop.json   |   39 +
+ .../tools/browser_emulate_media.json               |   86 +
+ .../user-Playwright/tools/browser_evaluate.json    |   30 +
+ .../user-Playwright/tools/browser_file_upload.json |   18 +
+ .../user-Playwright/tools/browser_fill_form.json   |   57 +
+ .../mcps/user-Playwright/tools/browser_find.json   |   23 +
+ .../tools/browser_handle_dialog.json               |   22 +
+ .../mcps/user-Playwright/tools/browser_hover.json  |   22 +
+ .../user-Playwright/tools/browser_navigate.json    |   18 +
+ .../tools/browser_navigate_back.json               |    8 +
+ .../tools/browser_network_request.json             |   34 +
+ .../tools/browser_network_requests.json            |   27 +
+ .../user-Playwright/tools/browser_press_key.json   |   18 +
+ .../mcps/user-Playwright/tools/browser_resize.json |   23 +
+ .../tools/browser_run_code_unsafe.json             |   19 +
+ .../tools/browser_select_option.json               |   30 +
+ .../user-Playwright/tools/browser_snapshot.json    |   27 +
+ .../mcps/user-Playwright/tools/browser_tabs.json   |   32 +
+ .../tools/browser_take_screenshot.json             |   48 +
+ .../mcps/user-Playwright/tools/browser_type.json   |   35 +
+ .../user-Playwright/tools/browser_wait_for.json    |   23 +
+ .../mcps/user-atlassian/INSTRUCTIONS.md            |   20 +
+ .../mcps/user-atlassian/SERVER_METADATA.json       |    4 +
+ .../mcps/user-atlassian/tools/addGraphContext.json |   47 +
+ .../tools/addOrEditJiraIssueComment.json           |   75 +
+ .../user-atlassian/tools/atlassianUserInfo.json    |    8 +
+ .../tools/createConfluenceContent.json             |   56 +
+ .../mcps/user-atlassian/tools/createJiraIssue.json |   71 +
+ .../mcps/user-atlassian/tools/discover.json        |   19 +
+ .../mcps/user-atlassian/tools/editJiraIssue.json   |   85 +
+ .../user-atlassian/tools/executeDestructive.json   |   42 +
+ .../mcps/user-atlassian/tools/executeRead.json     |   42 +
+ .../mcps/user-atlassian/tools/executeWrite.json    |   42 +
+ .../tools/getAccessibleAtlassianResources.json     |    8 +
+ .../user-atlassian/tools/getConfluenceContent.json |   54 +
+ .../mcps/user-atlassian/tools/getGraphContext.json |  100 +
+ .../mcps/user-atlassian/tools/getGraphObject.json  |   24 +
+ .../mcps/user-atlassian/tools/getJiraIssue.json    |   74 +
+ .../mcps/user-atlassian/tools/getLoomVideo.json    |   71 +
+ .../mcps/user-atlassian/tools/search.json          |   50 +
+ .../user-atlassian/tools/searchConfluence.json     |   43 +
+ .../tools/searchJiraIssuesUsingJql.json            |   70 +
+ .../user-atlassian/tools/transitionJiraIssue.json  |   68 +
+ .../tools/updateConfluenceContent.json             |   73 +
+ .../mcps/user-github/INSTRUCTIONS.md               |   18 +
+ .../mcps/user-github/SERVER_METADATA.json          |    4 +
+ .../user-github/prompts/AssignCodingAgent.json     |    4 +
+ .../user-github/prompts/issue_to_fix_workflow.json |    4 +
+ .../mcps/user-github/resources/get_me_ui.json      |    6 +
+ .../mcps/user-github/resources/issue_write_ui.json |    6 +
+ .../mcps/user-github/resources/pr_edit_ui.json     |    6 +
+ .../mcps/user-github/resources/pr_write_ui.json    |    6 +
+ .../tools/add_comment_to_pending_review.json       |   71 +
+ .../mcps/user-github/tools/add_issue_comment.json  |   52 +
+ .../tools/add_reply_to_pull_request_comment.json   |   51 +
+ .../mcps/user-github/tools/create_branch.json      |   32 +
+ .../user-github/tools/create_or_update_file.json   |   52 +
+ .../user-github/tools/create_pull_request.json     |   57 +
+ .../mcps/user-github/tools/create_repository.json  |   33 +
+ .../mcps/user-github/tools/delete_file.json        |   38 +
+ .../mcps/user-github/tools/fork_repository.json    |   27 +
+ .../mcps/user-github/tools/get_commit.json         |   49 +
+ .../mcps/user-github/tools/get_file_contents.json  |   54 +
+ .../mcps/user-github/tools/get_label.json          |   28 +
+ .../mcps/user-github/tools/get_latest_release.json |   23 +
+ .../mcps/user-github/tools/get_me.json             |    8 +
+ .../mcps/user-github/tools/get_release_by_tag.json |   28 +
+ .../mcps/user-github/tools/get_tag.json            |   28 +
+ .../mcps/user-github/tools/get_team_members.json   |   21 +
+ .../mcps/user-github/tools/get_teams.json          |   13 +
+ .../mcps/user-github/tools/issue_read.json         |   51 +
+ .../mcps/user-github/tools/issue_write.json        |  141 ++
+ .../mcps/user-github/tools/list_branches.json      |   34 +
+ .../mcps/user-github/tools/list_commits.json       |   68 +
+ .../mcps/user-github/tools/list_issue_fields.json  |   22 +
+ .../mcps/user-github/tools/list_issue_types.json   |   22 +
+ .../mcps/user-github/tools/list_issues.json        |  110 +
+ .../mcps/user-github/tools/list_pull_requests.json |  103 +
+ .../mcps/user-github/tools/list_releases.json      |   52 +
+ .../tools/list_repository_collaborators.json       |   43 +
+ .../mcps/user-github/tools/list_tags.json          |   34 +
+ .../mcps/user-github/tools/merge_pull_request.json |   49 +
+ .../mcps/user-github/tools/pull_request_read.json  |   59 +
+ .../tools/pull_request_review_write.json           |   61 +
+ .../mcps/user-github/tools/push_files.json         |   56 +
+ .../user-github/tools/request_copilot_review.json  |   28 +
+ .../user-github/tools/run_secret_scanning.json     |   41 +
+ .../mcps/user-github/tools/search_code.json        |   53 +
+ .../mcps/user-github/tools/search_commits.json     |   43 +
+ .../mcps/user-github/tools/search_issues.json      |   95 +
+ .../user-github/tools/search_pull_requests.json    |   93 +
+ .../user-github/tools/search_repositories.json     |   50 +
+ .../mcps/user-github/tools/search_users.json       |   44 +
+ .../mcps/user-github/tools/sub_issue_write.json    |   50 +
+ .../user-github/tools/update_issue_comment.json    |   35 +
+ .../user-github/tools/update_pull_request.json     |   63 +
+ .../tools/update_pull_request_branch.json          |   32 +
+ .../mcps/user-Playwright/SERVER_METADATA.json      |    4 +
+ .../mcps/user-Playwright/tools/browser_click.json  |   49 +
+ .../mcps/user-Playwright/tools/browser_close.json  |    8 +
+ .../tools/browser_console_messages.json            |   33 +
+ .../mcps/user-Playwright/tools/browser_drag.json   |   31 +
+ .../mcps/user-Playwright/tools/browser_drop.json   |   39 +
+ .../user-Playwright/tools/browser_evaluate.json    |   30 +
+ .../user-Playwright/tools/browser_file_upload.json |   18 +
+ .../user-Playwright/tools/browser_fill_form.json   |   57 +
+ .../tools/browser_handle_dialog.json               |   22 +
+ .../mcps/user-Playwright/tools/browser_hover.json  |   22 +
+ .../user-Playwright/tools/browser_navigate.json    |   18 +
+ .../tools/browser_navigate_back.json               |    8 +
+ .../tools/browser_network_request.json             |   34 +
+ .../tools/browser_network_requests.json            |   27 +
+ .../user-Playwright/tools/browser_press_key.json   |   18 +
+ .../mcps/user-Playwright/tools/browser_resize.json |   23 +
+ .../tools/browser_run_code_unsafe.json             |   19 +
+ .../tools/browser_select_option.json               |   30 +
+ .../user-Playwright/tools/browser_snapshot.json    |   27 +
+ .../mcps/user-Playwright/tools/browser_tabs.json   |   32 +
+ .../tools/browser_take_screenshot.json             |   49 +
+ .../mcps/user-Playwright/tools/browser_type.json   |   35 +
+ .../user-Playwright/tools/browser_wait_for.json    |   23 +
+ .../mcps/user-Playwright/SERVER_METADATA.json      |    4 +
+ .../mcps/user-Playwright/tools/browser_click.json  |   49 +
+ .../mcps/user-Playwright/tools/browser_close.json  |    8 +
+ .../tools/browser_console_messages.json            |   33 +
+ .../mcps/user-Playwright/tools/browser_drag.json   |   31 +
+ .../mcps/user-Playwright/tools/browser_drop.json   |   39 +
+ .../user-Playwright/tools/browser_evaluate.json    |   30 +
+ .../user-Playwright/tools/browser_file_upload.json |   18 +
+ .../user-Playwright/tools/browser_fill_form.json   |   57 +
+ .../tools/browser_handle_dialog.json               |   22 +
+ .../mcps/user-Playwright/tools/browser_hover.json  |   22 +
+ .../user-Playwright/tools/browser_navigate.json    |   18 +
+ .../tools/browser_navigate_back.json               |    8 +
+ .../tools/browser_network_request.json             |   34 +
+ .../tools/browser_network_requests.json            |   27 +
+ .../user-Playwright/tools/browser_press_key.json   |   18 +
+ .../mcps/user-Playwright/tools/browser_resize.json |   23 +
+ .../tools/browser_run_code_unsafe.json             |   19 +
+ .../tools/browser_select_option.json               |   30 +
+ .../user-Playwright/tools/browser_snapshot.json    |   27 +
+ .../mcps/user-Playwright/tools/browser_tabs.json   |   32 +
+ .../tools/browser_take_screenshot.json             |   49 +
+ .../mcps/user-Playwright/tools/browser_type.json   |   35 +
+ .../user-Playwright/tools/browser_wait_for.json    |   23 +
+ .../mcps/cursor-ide-browser/INSTRUCTIONS.md        |   47 +
+ .../mcps/cursor-ide-browser/SERVER_METADATA.json   |    4 +
+ .../mcps/cursor-ide-browser/tools/browser_cdp.json |   28 +
+ .../cursor-ide-browser/tools/browser_click.json    |   67 +
+ .../cursor-ide-browser/tools/browser_drag.json     |   36 +
+ .../cursor-ide-browser/tools/browser_fill.json     |   33 +
+ .../tools/browser_get_bounding_box.json            |   24 +
+ .../tools/browser_highlight.json                   |   28 +
+ .../cursor-ide-browser/tools/browser_lock.json     |   24 +
+ .../tools/browser_mouse_click_xy.json              |   38 +
+ .../cursor-ide-browser/tools/browser_navigate.json |   36 +
+ .../tools/browser_press_key.json                   |   24 +
+ .../cursor-ide-browser/tools/browser_scroll.json   |   48 +
+ .../tools/browser_select_option.json               |   36 +
+ .../cursor-ide-browser/tools/browser_snapshot.json |   38 +
+ .../cursor-ide-browser/tools/browser_tabs.json     |   34 +
+ .../tools/browser_take_screenshot.json             |   34 +
+ .../cursor-ide-browser/tools/browser_type.json     |   45 +
+ .../mcps/cursor-origin-readonly/INSTRUCTIONS.md    |    1 +
+ .../cursor-origin-readonly/SERVER_METADATA.json    |    4 +
+ .../cursor-origin-readonly/tools/checks_read.json  |   54 +
+ .../cursor-origin-readonly/tools/commit_read.json  |   43 +
+ .../tools/compare_commits.json                     |   33 +
+ .../tools/get_file_contents.json                   |   36 +
+ .../cursor-origin-readonly/tools/get_git_tree.json |   32 +
+ .../tools/get_repository.json                      |   23 +
+ .../tools/grep_contents.json                       |   74 +
+ .../tools/list_branches.json                       |   33 +
+ .../cursor-origin-readonly/tools/list_commits.json |   55 +
+ .../tools/list_namespaces.json                     |   17 +
+ .../tools/list_pull_requests.json                  |   53 +
+ .../tools/list_repositories.json                   |   28 +
+ .../tools/pull_request_read.json                   |   50 +
+ .../mcps/user-Playwright/SERVER_METADATA.json      |    4 +
+ .../mcps/user-Playwright/tools/browser_click.json  |   49 +
+ .../mcps/user-Playwright/tools/browser_close.json  |    8 +
+ .../tools/browser_console_messages.json            |   33 +
+ .../mcps/user-Playwright/tools/browser_drag.json   |   31 +
+ .../mcps/user-Playwright/tools/browser_drop.json   |   39 +
+ .../tools/browser_emulate_media.json               |   86 +
+ .../user-Playwright/tools/browser_evaluate.json    |   30 +
+ .../user-Playwright/tools/browser_file_upload.json |   18 +
+ .../user-Playwright/tools/browser_fill_form.json   |   57 +
+ .../mcps/user-Playwright/tools/browser_find.json   |   23 +
+ .../tools/browser_handle_dialog.json               |   22 +
+ .../mcps/user-Playwright/tools/browser_hover.json  |   22 +
+ .../user-Playwright/tools/browser_navigate.json    |   18 +
+ .../tools/browser_navigate_back.json               |    8 +
+ .../tools/browser_network_request.json             |   34 +
+ .../tools/browser_network_requests.json            |   27 +
+ .../user-Playwright/tools/browser_press_key.json   |   18 +
+ .../mcps/user-Playwright/tools/browser_resize.json |   23 +
+ .../tools/browser_run_code_unsafe.json             |   19 +
+ .../tools/browser_select_option.json               |   30 +
+ .../user-Playwright/tools/browser_snapshot.json    |   27 +
+ .../mcps/user-Playwright/tools/browser_tabs.json   |   32 +
+ .../tools/browser_take_screenshot.json             |   48 +
+ .../mcps/user-Playwright/tools/browser_type.json   |   35 +
+ .../user-Playwright/tools/browser_wait_for.json    |   23 +
+ .../mcps/user-atlassian/INSTRUCTIONS.md            |   20 +
+ .../mcps/user-atlassian/SERVER_METADATA.json       |    4 +
+ .../mcps/user-atlassian/tools/addGraphContext.json |   47 +
+ .../tools/addOrEditJiraIssueComment.json           |   75 +
+ .../user-atlassian/tools/atlassianUserInfo.json    |    8 +
+ .../tools/createConfluenceContent.json             |   56 +
+ .../mcps/user-atlassian/tools/createJiraIssue.json |   71 +
+ .../mcps/user-atlassian/tools/discover.json        |   19 +
+ .../mcps/user-atlassian/tools/editJiraIssue.json   |   85 +
+ .../user-atlassian/tools/executeDestructive.json   |   42 +
+ .../mcps/user-atlassian/tools/executeRead.json     |   42 +
+ .../mcps/user-atlassian/tools/executeWrite.json    |   42 +
+ .../tools/getAccessibleAtlassianResources.json     |    8 +
+ .../user-atlassian/tools/getConfluenceContent.json |   54 +
+ .../mcps/user-atlassian/tools/getGraphContext.json |  100 +
+ .../mcps/user-atlassian/tools/getGraphObject.json  |   24 +
+ .../mcps/user-atlassian/tools/getJiraIssue.json    |   74 +
+ .../mcps/user-atlassian/tools/getLoomVideo.json    |   71 +
+ .../mcps/user-atlassian/tools/search.json          |   50 +
+ .../user-atlassian/tools/searchConfluence.json     |   43 +
+ .../tools/searchJiraIssuesUsingJql.json            |   70 +
+ .../user-atlassian/tools/transitionJiraIssue.json  |   68 +
+ .../tools/updateConfluenceContent.json             |   73 +
+ .../mcps/user-github/INSTRUCTIONS.md               |   18 +
+ .../mcps/user-github/SERVER_METADATA.json          |    4 +
+ .../user-github/prompts/AssignCodingAgent.json     |    4 +
+ .../user-github/prompts/issue_to_fix_workflow.json |    4 +
+ .../mcps/user-github/resources/get_me_ui.json      |    6 +
+ .../mcps/user-github/resources/issue_write_ui.json |    6 +
+ .../mcps/user-github/resources/pr_edit_ui.json     |    6 +
+ .../mcps/user-github/resources/pr_write_ui.json    |    6 +
+ .../tools/add_comment_to_pending_review.json       |   71 +
+ .../mcps/user-github/tools/add_issue_comment.json  |   52 +
+ .../tools/add_reply_to_pull_request_comment.json   |   51 +
+ .../mcps/user-github/tools/create_branch.json      |   32 +
+ .../user-github/tools/create_or_update_file.json   |   52 +
+ .../user-github/tools/create_pull_request.json     |   57 +
+ .../mcps/user-github/tools/create_repository.json  |   33 +
+ .../mcps/user-github/tools/delete_file.json        |   38 +
+ .../mcps/user-github/tools/fork_repository.json    |   27 +
+ .../mcps/user-github/tools/get_commit.json         |   49 +
+ .../mcps/user-github/tools/get_file_contents.json  |   54 +
+ .../mcps/user-github/tools/get_label.json          |   28 +
+ .../mcps/user-github/tools/get_latest_release.json |   23 +
+ .../mcps/user-github/tools/get_me.json             |    8 +
+ .../mcps/user-github/tools/get_release_by_tag.json |   28 +
+ .../mcps/user-github/tools/get_tag.json            |   28 +
+ .../mcps/user-github/tools/get_team_members.json   |   21 +
+ .../mcps/user-github/tools/get_teams.json          |   13 +
+ .../mcps/user-github/tools/issue_read.json         |   51 +
+ .../mcps/user-github/tools/issue_write.json        |  141 ++
+ .../mcps/user-github/tools/list_branches.json      |   34 +
+ .../mcps/user-github/tools/list_commits.json       |   68 +
+ .../mcps/user-github/tools/list_issue_fields.json  |   22 +
+ .../mcps/user-github/tools/list_issue_types.json   |   22 +
+ .../mcps/user-github/tools/list_issues.json        |  110 +
+ .../mcps/user-github/tools/list_pull_requests.json |  103 +
+ .../mcps/user-github/tools/list_releases.json      |   52 +
+ .../tools/list_repository_collaborators.json       |   43 +
+ .../mcps/user-github/tools/list_tags.json          |   34 +
+ .../mcps/user-github/tools/merge_pull_request.json |   49 +
+ .../mcps/user-github/tools/pull_request_read.json  |   59 +
+ .../tools/pull_request_review_write.json           |   61 +
+ .../mcps/user-github/tools/push_files.json         |   56 +
+ .../user-github/tools/request_copilot_review.json  |   28 +
+ .../user-github/tools/run_secret_scanning.json     |   41 +
+ .../mcps/user-github/tools/search_code.json        |   53 +
+ .../mcps/user-github/tools/search_commits.json     |   43 +
+ .../mcps/user-github/tools/search_issues.json      |   95 +
+ .../user-github/tools/search_pull_requests.json    |   93 +
+ .../user-github/tools/search_repositories.json     |   50 +
+ .../mcps/user-github/tools/search_users.json       |   44 +
+ .../mcps/user-github/tools/sub_issue_write.json    |   50 +
+ .../user-github/tools/update_issue_comment.json    |   35 +
+ .../user-github/tools/update_pull_request.json     |   63 +
+ .../tools/update_pull_request_branch.json          |   32 +
+ .../mcps/cursor-ide-browser/INSTRUCTIONS.md        |   47 +
+ .../mcps/cursor-ide-browser/SERVER_METADATA.json   |    4 +
+ .../mcps/cursor-ide-browser/tools/browser_cdp.json |   28 +
+ .../cursor-ide-browser/tools/browser_click.json    |   67 +
+ .../cursor-ide-browser/tools/browser_drag.json     |   36 +
+ .../cursor-ide-browser/tools/browser_fill.json     |   33 +
+ .../tools/browser_get_bounding_box.json            |   24 +
+ .../tools/browser_highlight.json                   |   28 +
+ .../cursor-ide-browser/tools/browser_lock.json     |   24 +
+ .../tools/browser_mouse_click_xy.json              |   38 +
+ .../cursor-ide-browser/tools/browser_navigate.json |   36 +
+ .../tools/browser_press_key.json                   |   24 +
+ .../cursor-ide-browser/tools/browser_scroll.json   |   48 +
+ .../tools/browser_select_option.json               |   36 +
+ .../cursor-ide-browser/tools/browser_snapshot.json |   38 +
+ .../cursor-ide-browser/tools/browser_tabs.json     |   34 +
+ .../tools/browser_take_screenshot.json             |   34 +
+ .../cursor-ide-browser/tools/browser_type.json     |   45 +
+ .../mcps/cursor-origin-readonly/INSTRUCTIONS.md    |    1 +
+ .../cursor-origin-readonly/SERVER_METADATA.json    |    4 +
+ .../cursor-origin-readonly/tools/checks_read.json  |   54 +
+ .../cursor-origin-readonly/tools/commit_read.json  |   43 +
+ .../tools/compare_commits.json                     |   33 +
+ .../tools/get_file_contents.json                   |   36 +
+ .../cursor-origin-readonly/tools/get_git_tree.json |   32 +
+ .../tools/get_repository.json                      |   23 +
+ .../tools/grep_contents.json                       |   74 +
+ .../tools/list_branches.json                       |   33 +
+ .../cursor-origin-readonly/tools/list_commits.json |   55 +
+ .../tools/list_namespaces.json                     |   17 +
+ .../tools/list_pull_requests.json                  |   53 +
+ .../tools/list_repositories.json                   |   28 +
+ .../tools/pull_request_read.json                   |   50 +
+ .../mcps/user-Playwright/SERVER_METADATA.json      |    4 +
+ .../mcps/user-Playwright/tools/browser_click.json  |   49 +
+ .../mcps/user-Playwright/tools/browser_close.json  |    8 +
+ .../tools/browser_console_messages.json            |   33 +
+ .../mcps/user-Playwright/tools/browser_drag.json   |   31 +
+ .../mcps/user-Playwright/tools/browser_drop.json   |   39 +
+ .../tools/browser_emulate_media.json               |   86 +
+ .../user-Playwright/tools/browser_evaluate.json    |   30 +
+ .../user-Playwright/tools/browser_file_upload.json |   18 +
+ .../user-Playwright/tools/browser_fill_form.json   |   57 +
+ .../mcps/user-Playwright/tools/browser_find.json   |   23 +
+ .../tools/browser_handle_dialog.json               |   22 +
+ .../mcps/user-Playwright/tools/browser_hover.json  |   22 +
+ .../user-Playwright/tools/browser_navigate.json    |   18 +
+ .../tools/browser_navigate_back.json               |    8 +
+ .../tools/browser_network_request.json             |   34 +
+ .../tools/browser_network_requests.json            |   27 +
+ .../user-Playwright/tools/browser_press_key.json   |   18 +
+ .../mcps/user-Playwright/tools/browser_resize.json |   23 +
+ .../tools/browser_run_code_unsafe.json             |   19 +
+ .../tools/browser_select_option.json               |   30 +
+ .../user-Playwright/tools/browser_snapshot.json    |   27 +
+ .../mcps/user-Playwright/tools/browser_tabs.json   |   32 +
+ .../tools/browser_take_screenshot.json             |   48 +
+ .../mcps/user-Playwright/tools/browser_type.json   |   35 +
+ .../user-Playwright/tools/browser_wait_for.json    |   23 +
+ .../mcps/user-atlassian/INSTRUCTIONS.md            |   20 +
+ .../mcps/user-atlassian/SERVER_METADATA.json       |    4 +
+ .../mcps/user-atlassian/tools/addGraphContext.json |   47 +
+ .../tools/addOrEditJiraIssueComment.json           |   75 +
+ .../user-atlassian/tools/atlassianUserInfo.json    |    8 +
+ .../tools/createConfluenceContent.json             |   56 +
+ .../mcps/user-atlassian/tools/createJiraIssue.json |   71 +
+ .../mcps/user-atlassian/tools/discover.json        |   19 +
+ .../mcps/user-atlassian/tools/editJiraIssue.json   |   85 +
+ .../user-atlassian/tools/executeDestructive.json   |   42 +
+ .../mcps/user-atlassian/tools/executeRead.json     |   42 +
+ .../mcps/user-atlassian/tools/executeWrite.json    |   42 +
+ .../tools/getAccessibleAtlassianResources.json     |    8 +
+ .../user-atlassian/tools/getConfluenceContent.json |   54 +
+ .../mcps/user-atlassian/tools/getGraphContext.json |  100 +
+ .../mcps/user-atlassian/tools/getGraphObject.json  |   24 +
+ .../mcps/user-atlassian/tools/getJiraIssue.json    |   74 +
+ .../mcps/user-atlassian/tools/getLoomVideo.json    |   71 +
+ .../mcps/user-atlassian/tools/search.json          |   50 +
+ .../user-atlassian/tools/searchConfluence.json     |   43 +
+ .../tools/searchJiraIssuesUsingJql.json            |   70 +
+ .../user-atlassian/tools/transitionJiraIssue.json  |   68 +
+ .../tools/updateConfluenceContent.json             |   73 +
+ .../mcps/user-github/INSTRUCTIONS.md               |   18 +
+ .../mcps/user-github/SERVER_METADATA.json          |    4 +
+ .../user-github/prompts/AssignCodingAgent.json     |    4 +
+ .../user-github/prompts/issue_to_fix_workflow.json |    4 +
+ .../mcps/user-github/resources/get_me_ui.json      |    6 +
+ .../mcps/user-github/resources/issue_write_ui.json |    6 +
+ .../mcps/user-github/resources/pr_edit_ui.json     |    6 +
+ .../mcps/user-github/resources/pr_write_ui.json    |    6 +
+ .../tools/add_comment_to_pending_review.json       |   71 +
+ .../mcps/user-github/tools/add_issue_comment.json  |   52 +
+ .../tools/add_reply_to_pull_request_comment.json   |   51 +
+ .../mcps/user-github/tools/create_branch.json      |   32 +
+ .../user-github/tools/create_or_update_file.json   |   52 +
+ .../user-github/tools/create_pull_request.json     |   57 +
+ .../mcps/user-github/tools/create_repository.json  |   33 +
+ .../mcps/user-github/tools/delete_file.json        |   38 +
+ .../mcps/user-github/tools/fork_repository.json    |   27 +
+ .../mcps/user-github/tools/get_commit.json         |   49 +
+ .../mcps/user-github/tools/get_file_contents.json  |   54 +
+ .../mcps/user-github/tools/get_label.json          |   28 +
+ .../mcps/user-github/tools/get_latest_release.json |   23 +
+ .../mcps/user-github/tools/get_me.json             |    8 +
+ .../mcps/user-github/tools/get_release_by_tag.json |   28 +
+ .../mcps/user-github/tools/get_tag.json            |   28 +
+ .../mcps/user-github/tools/get_team_members.json   |   21 +
+ .../mcps/user-github/tools/get_teams.json          |   13 +
+ .../mcps/user-github/tools/issue_read.json         |   51 +
+ .../mcps/user-github/tools/issue_write.json        |  141 ++
+ .../mcps/user-github/tools/list_branches.json      |   34 +
+ .../mcps/user-github/tools/list_commits.json       |   68 +
+ .../mcps/user-github/tools/list_issue_fields.json  |   22 +
+ .../mcps/user-github/tools/list_issue_types.json   |   22 +
+ .../mcps/user-github/tools/list_issues.json        |  110 +
+ .../mcps/user-github/tools/list_pull_requests.json |  103 +
+ .../mcps/user-github/tools/list_releases.json      |   52 +
+ .../tools/list_repository_collaborators.json       |   43 +
+ .../mcps/user-github/tools/list_tags.json          |   34 +
+ .../mcps/user-github/tools/merge_pull_request.json |   49 +
+ .../mcps/user-github/tools/pull_request_read.json  |   59 +
+ .../tools/pull_request_review_write.json           |   61 +
+ .../mcps/user-github/tools/push_files.json         |   56 +
+ .../user-github/tools/request_copilot_review.json  |   28 +
+ .../user-github/tools/run_secret_scanning.json     |   41 +
+ .../mcps/user-github/tools/search_code.json        |   53 +
+ .../mcps/user-github/tools/search_commits.json     |   43 +
+ .../mcps/user-github/tools/search_issues.json      |   95 +
+ .../user-github/tools/search_pull_requests.json    |   93 +
+ .../user-github/tools/search_repositories.json     |   50 +
+ .../mcps/user-github/tools/search_users.json       |   44 +
+ .../mcps/user-github/tools/sub_issue_write.json    |   50 +
+ .../user-github/tools/update_issue_comment.json    |   35 +
+ .../user-github/tools/update_pull_request.json     |   63 +
+ .../tools/update_pull_request_branch.json          |   32 +
+ .../2588dac5-3bba-4ca8-9e84-09f97e16ba14.jsonl     |   32 +
+ .../mcps/cursor-ide-browser/INSTRUCTIONS.md        |   47 +
+ .../mcps/cursor-ide-browser/SERVER_METADATA.json   |    4 +
+ .../mcps/cursor-ide-browser/tools/browser_cdp.json |   28 +
+ .../cursor-ide-browser/tools/browser_click.json    |   67 +
+ .../cursor-ide-browser/tools/browser_drag.json     |   36 +
+ .../cursor-ide-browser/tools/browser_fill.json     |   33 +
+ .../tools/browser_get_bounding_box.json            |   24 +
+ .../tools/browser_highlight.json                   |   28 +
+ .../cursor-ide-browser/tools/browser_lock.json     |   24 +
+ .../tools/browser_mouse_click_xy.json              |   38 +
+ .../cursor-ide-browser/tools/browser_navigate.json |   36 +
+ .../tools/browser_press_key.json                   |   24 +
+ .../cursor-ide-browser/tools/browser_scroll.json   |   48 +
+ .../tools/browser_select_option.json               |   36 +
+ .../cursor-ide-browser/tools/browser_snapshot.json |   38 +
+ .../cursor-ide-browser/tools/browser_tabs.json     |   34 +
+ .../tools/browser_take_screenshot.json             |   34 +
+ .../cursor-ide-browser/tools/browser_type.json     |   45 +
+ .../mcps/cursor-origin-readonly/INSTRUCTIONS.md    |    1 +
+ .../cursor-origin-readonly/SERVER_METADATA.json    |    4 +
+ .../cursor-origin-readonly/tools/checks_read.json  |   54 +
+ .../cursor-origin-readonly/tools/commit_read.json  |   43 +
+ .../tools/compare_commits.json                     |   33 +
+ .../tools/get_file_contents.json                   |   36 +
+ .../cursor-origin-readonly/tools/get_git_tree.json |   32 +
+ .../tools/get_repository.json                      |   23 +
+ .../tools/grep_contents.json                       |   74 +
+ .../tools/list_branches.json                       |   33 +
+ .../cursor-origin-readonly/tools/list_commits.json |   55 +
+ .../tools/list_namespaces.json                     |   17 +
+ .../tools/list_pull_requests.json                  |   57 +
+ .../tools/list_repositories.json                   |   28 +
+ .../tools/pull_request_read.json                   |   50 +
+ .../mcps/plugin-exa-exa/SERVER_METADATA.json       |    4 +
+ .../mcps/plugin-exa-exa/STATUS.md                  |    1 +
+ .../mcps/plugin-exa-exa/tools/mcp_auth.json        |    9 +
+ .../mcps/user-atlassian/INSTRUCTIONS.md            |   20 +
+ .../mcps/user-atlassian/SERVER_METADATA.json       |    4 +
+ .../mcps/user-atlassian/tools/addGraphContext.json |   47 +
+ .../tools/addOrEditJiraIssueComment.json           |   75 +
+ .../user-atlassian/tools/atlassianUserInfo.json    |    8 +
+ .../tools/createConfluenceContent.json             |   56 +
+ .../mcps/user-atlassian/tools/createJiraIssue.json |   71 +
+ .../mcps/user-atlassian/tools/discover.json        |   19 +
+ .../mcps/user-atlassian/tools/editJiraIssue.json   |   85 +
+ .../user-atlassian/tools/executeDestructive.json   |   42 +
+ .../mcps/user-atlassian/tools/executeRead.json     |   42 +
+ .../mcps/user-atlassian/tools/executeWrite.json    |   42 +
+ .../tools/getAccessibleAtlassianResources.json     |    8 +
+ .../user-atlassian/tools/getConfluenceContent.json |   54 +
+ .../mcps/user-atlassian/tools/getGraphContext.json |  100 +
+ .../mcps/user-atlassian/tools/getGraphObject.json  |   24 +
+ .../mcps/user-atlassian/tools/getJiraIssue.json    |   74 +
+ .../mcps/user-atlassian/tools/getLoomVideo.json    |   71 +
+ .../mcps/user-atlassian/tools/search.json          |   50 +
+ .../user-atlassian/tools/searchConfluence.json     |   43 +
+ .../tools/searchJiraIssuesUsingJql.json            |   70 +
+ .../user-atlassian/tools/transitionJiraIssue.json  |   68 +
+ .../tools/updateConfluenceContent.json             |   73 +
+ .../mcps/user-github/INSTRUCTIONS.md               |   18 +
+ .../mcps/user-github/SERVER_METADATA.json          |    4 +
+ .../user-github/prompts/AssignCodingAgent.json     |    4 +
+ .../user-github/prompts/issue_to_fix_workflow.json |    4 +
+ .../mcps/user-github/resources/get_me_ui.json      |    6 +
+ .../mcps/user-github/resources/issue_write_ui.json |    6 +
+ .../mcps/user-github/resources/pr_edit_ui.json     |    6 +
+ .../mcps/user-github/resources/pr_write_ui.json    |    6 +
+ .../tools/add_comment_to_pending_review.json       |   71 +
+ .../mcps/user-github/tools/add_issue_comment.json  |   52 +
+ .../tools/add_reply_to_pull_request_comment.json   |   51 +
+ .../mcps/user-github/tools/create_branch.json      |   32 +
+ .../user-github/tools/create_or_update_file.json   |   52 +
+ .../user-github/tools/create_pull_request.json     |   57 +
+ .../mcps/user-github/tools/create_repository.json  |   33 +
+ .../mcps/user-github/tools/delete_file.json        |   38 +
+ .../mcps/user-github/tools/fork_repository.json    |   27 +
+ .../mcps/user-github/tools/get_commit.json         |   49 +
+ .../mcps/user-github/tools/get_file_contents.json  |   54 +
+ .../mcps/user-github/tools/get_label.json          |   28 +
+ .../mcps/user-github/tools/get_latest_release.json |   23 +
+ .../mcps/user-github/tools/get_me.json             |    8 +
+ .../mcps/user-github/tools/get_release_by_tag.json |   28 +
+ .../mcps/user-github/tools/get_tag.json            |   28 +
+ .../mcps/user-github/tools/get_team_members.json   |   21 +
+ .../mcps/user-github/tools/get_teams.json          |   13 +
+ .../mcps/user-github/tools/issue_read.json         |   51 +
+ .../mcps/user-github/tools/issue_write.json        |  141 ++
+ .../mcps/user-github/tools/list_branches.json      |   34 +
+ .../mcps/user-github/tools/list_commits.json       |   68 +
+ .../mcps/user-github/tools/list_issue_fields.json  |   22 +
+ .../mcps/user-github/tools/list_issue_types.json   |   22 +
+ .../mcps/user-github/tools/list_issues.json        |  110 +
+ .../mcps/user-github/tools/list_pull_requests.json |  103 +
+ .../mcps/user-github/tools/list_releases.json      |   52 +
+ .../tools/list_repository_collaborators.json       |   43 +
+ .../mcps/user-github/tools/list_tags.json          |   34 +
+ .../mcps/user-github/tools/merge_pull_request.json |   49 +
+ .../mcps/user-github/tools/pull_request_read.json  |   59 +
+ .../tools/pull_request_review_write.json           |   61 +
+ .../mcps/user-github/tools/push_files.json         |   56 +
+ .../user-github/tools/request_copilot_review.json  |   28 +
+ .../user-github/tools/run_secret_scanning.json     |   41 +
+ .../mcps/user-github/tools/search_code.json        |   53 +
+ .../mcps/user-github/tools/search_commits.json     |   43 +
+ .../mcps/user-github/tools/search_issues.json      |   95 +
+ .../user-github/tools/search_pull_requests.json    |   93 +
+ .../user-github/tools/search_repositories.json     |   50 +
+ .../mcps/user-github/tools/search_users.json       |   44 +
+ .../mcps/user-github/tools/sub_issue_write.json    |   50 +
+ .../user-github/tools/update_issue_comment.json    |   35 +
+ .../user-github/tools/update_pull_request.json     |   63 +
+ .../tools/update_pull_request_branch.json          |   32 +
+ .../086a3169-efde-4ff0-988b-1148e8a730ba.txt       |  342 +++
+ .../08ba3d76-761c-43c6-8c74-cce3ed271952.txt       |  335 +++
+ .../0d2d564f-4778-4b1a-97e1-fd16ea7c088d.txt       |  342 +++
+ .../0ee9c7b2-ea87-45a6-820a-8c159bbc9b21.txt       | 1785 ++++++++++++++
+ .../27c63618-6a31-4e5c-8b49-ff5c37fc1b0d.txt       |  505 ++++
+ .../70eafeea-4be5-4d46-8c23-4a9604c1790e.txt       |  365 +++
+ .../75a68f91-47f4-4e4d-b692-e0c6285f2bea.txt       |  308 +++
+ .../87790524-1efb-4f64-91c8-ee4d2d5764b7.txt       |  322 +++
+ .../88e9e010-fb17-43f0-bd7f-f8f87050e89c.txt       |  308 +++
+ .../ace36236-645d-4682-896f-18ad7c332493.txt       |  505 ++++
+ .../c0bf562d-3753-4a2c-91f0-b95b5f566989.txt       |  335 +++
+ .../c316998e-f31f-4b10-809a-afb923e791ad.txt       |  273 +++
+ .../e25e0da9-76ef-4138-add5-cd7731787818.txt       |  386 ++++
+ .../45ba8fc1-39cb-4f6a-bcec-7a41000d2e6b.jsonl     |   25 +
+ .../23c22811-80f3-408e-bfbc-b59c33c2a1ca.jsonl     |   10 +
+ .../2bd7ed39-eb3c-4fbf-9354-f979d8c0f608.jsonl     |   13 +
+ .../412c2aa2-81f4-436a-b562-15e7dc325ae3.jsonl     |    9 +
+ .../4a374688-04e2-49b6-9144-f83e9310c993.jsonl     |   14 +
+ .../4a3c2850-c8a3-4e9e-ba65-933b0f075735.jsonl     |    8 +
+ .../59168805-c229-4cde-bae0-0149544f866d.jsonl     |   14 +
+ .../79e5e769-b425-446f-94c2-053c39cd9658.jsonl     |   22 +
+ .../676376ba-c82a-4fc2-9747-685626a38d26.jsonl     |   18 +
+ .../b57dfe44-ab38-4b99-b44d-403d971768ce.jsonl     |   13 +
+ .../b7af7521-0cad-4c79-b027-b3f67cf6ef05.jsonl     |    7 +
+ .../d5ffa147-5248-41c2-8142-2e8b1e4c2f2b.jsonl     |   26 +
+ .../133a9cd6-7287-49e8-b084-f1909188eb85.jsonl     |    1 +
+ .../fa83f5b4-d5c4-4980-9ff2-3ce501056ffa.jsonl     |   12 +
+ .../mcps/cursor-origin/SERVER_METADATA.json        |    4 +
+ .../mcps/cursor-origin/STATUS.md                   |    1 +
+ .../mcps/plugin-exa-exa/SERVER_METADATA.json       |    4 +
+ .../mcps/plugin-exa-exa/STATUS.md                  |    1 +
+ .../mcps/plugin-exa-exa/tools/mcp_auth.json        |    9 +
+ .../mcps/user-atlassian/INSTRUCTIONS.md            |   20 +
+ .../mcps/user-atlassian/SERVER_METADATA.json       |    4 +
+ .../mcps/user-atlassian/tools/addGraphContext.json |   47 +
+ .../tools/addOrEditJiraIssueComment.json           |   75 +
+ .../user-atlassian/tools/atlassianUserInfo.json    |    8 +
+ .../tools/createConfluenceContent.json             |   56 +
+ .../mcps/user-atlassian/tools/createJiraIssue.json |   71 +
+ .../mcps/user-atlassian/tools/discover.json        |   19 +
+ .../mcps/user-atlassian/tools/editJiraIssue.json   |   85 +
+ .../user-atlassian/tools/executeDestructive.json   |   42 +
+ .../mcps/user-atlassian/tools/executeRead.json     |   42 +
+ .../mcps/user-atlassian/tools/executeWrite.json    |   42 +
+ .../tools/getAccessibleAtlassianResources.json     |    8 +
+ .../user-atlassian/tools/getConfluenceContent.json |   54 +
+ .../mcps/user-atlassian/tools/getGraphContext.json |  100 +
+ .../mcps/user-atlassian/tools/getGraphObject.json  |   24 +
+ .../mcps/user-atlassian/tools/getJiraIssue.json    |   74 +
+ .../mcps/user-atlassian/tools/getLoomVideo.json    |   71 +
+ .../mcps/user-atlassian/tools/search.json          |   50 +
+ .../user-atlassian/tools/searchConfluence.json     |   43 +
+ .../tools/searchJiraIssuesUsingJql.json            |   70 +
+ .../user-atlassian/tools/transitionJiraIssue.json  |   68 +
+ .../tools/updateConfluenceContent.json             |   73 +
+ .../mcps/user-github/INSTRUCTIONS.md               |   18 +
+ .../mcps/user-github/SERVER_METADATA.json          |    4 +
+ .../user-github/prompts/AssignCodingAgent.json     |    4 +
+ .../user-github/prompts/issue_to_fix_workflow.json |    4 +
+ .../mcps/user-github/resources/get_me_ui.json      |    6 +
+ .../mcps/user-github/resources/issue_write_ui.json |    6 +
+ .../mcps/user-github/resources/pr_edit_ui.json     |    6 +
+ .../mcps/user-github/resources/pr_write_ui.json    |    6 +
+ .../tools/add_comment_to_pending_review.json       |   71 +
+ .../mcps/user-github/tools/add_issue_comment.json  |   52 +
+ .../tools/add_reply_to_pull_request_comment.json   |   51 +
+ .../mcps/user-github/tools/create_branch.json      |   32 +
+ .../user-github/tools/create_or_update_file.json   |   52 +
+ .../user-github/tools/create_pull_request.json     |   57 +
+ .../mcps/user-github/tools/create_repository.json  |   33 +
+ .../mcps/user-github/tools/delete_file.json        |   38 +
+ .../mcps/user-github/tools/fork_repository.json    |   27 +
+ .../mcps/user-github/tools/get_commit.json         |   49 +
+ .../mcps/user-github/tools/get_file_contents.json  |   54 +
+ .../mcps/user-github/tools/get_label.json          |   28 +
+ .../mcps/user-github/tools/get_latest_release.json |   23 +
+ .../mcps/user-github/tools/get_me.json             |    8 +
+ .../mcps/user-github/tools/get_release_by_tag.json |   28 +
+ .../mcps/user-github/tools/get_tag.json            |   28 +
+ .../mcps/user-github/tools/get_team_members.json   |   21 +
+ .../mcps/user-github/tools/get_teams.json          |   13 +
+ .../mcps/user-github/tools/issue_read.json         |   51 +
+ .../mcps/user-github/tools/issue_write.json        |  141 ++
+ .../mcps/user-github/tools/list_branches.json      |   34 +
+ .../mcps/user-github/tools/list_commits.json       |   68 +
+ .../mcps/user-github/tools/list_issue_fields.json  |   22 +
+ .../mcps/user-github/tools/list_issue_types.json   |   22 +
+ .../mcps/user-github/tools/list_issues.json        |  110 +
+ .../mcps/user-github/tools/list_pull_requests.json |  103 +
+ .../mcps/user-github/tools/list_releases.json      |   52 +
+ .../tools/list_repository_collaborators.json       |   43 +
+ .../mcps/user-github/tools/list_tags.json          |   34 +
+ .../mcps/user-github/tools/merge_pull_request.json |   49 +
+ .../mcps/user-github/tools/pull_request_read.json  |   59 +
+ .../tools/pull_request_review_write.json           |   61 +
+ .../mcps/user-github/tools/push_files.json         |   56 +
+ .../user-github/tools/request_copilot_review.json  |   28 +
+ .../user-github/tools/run_secret_scanning.json     |   41 +
+ .../mcps/user-github/tools/search_code.json        |   53 +
+ .../mcps/user-github/tools/search_commits.json     |   43 +
+ .../mcps/user-github/tools/search_issues.json      |   95 +
+ .../user-github/tools/search_pull_requests.json    |   93 +
+ .../user-github/tools/search_repositories.json     |   50 +
+ .../mcps/user-github/tools/search_users.json       |   44 +
+ .../mcps/user-github/tools/sub_issue_write.json    |   50 +
+ .../mcps/user-github/tools/ui_get.json             |   36 +
+ .../user-github/tools/update_issue_comment.json    |   35 +
+ .../user-github/tools/update_pull_request.json     |   63 +
+ .../tools/update_pull_request_branch.json          |   32 +
+ .../08dcefad-fd14-4d50-ac94-7b1ac668ac5b.txt       |  484 ++++
+ .../0ef44045-d775-4508-a09f-9fca9ac84536.txt       | 2276 ++++++++++++++++++
+ .../65b42282-bf50-4796-b990-402589a959de.txt       | 1861 +++++++++++++++
+ .../e81219a1-c267-44ab-91ab-434cbd8622e1.txt       | 1737 ++++++++++++++
+ .../ebde0599-6d1e-42d4-b68a-fe20205c07f9.txt       | 2425 ++++++++++++++++++++
+ .../7153c856-f874-47f5-af4d-08a48fb578cd.jsonl     |   23 +
+ .../a67b6f0d-5890-4162-9c4d-7828a934e302.jsonl     |    1 +
+ .../78cdca08-e84e-48f6-8ff3-42a5ecc604b4.jsonl     |    1 +
+ .../mcps/cursor-app-control/INSTRUCTIONS.md        |    1 +
+ .../mcps/cursor-app-control/SERVER_METADATA.json   |    4 +
+ .../mcps/cursor-app-control/tools/create_repo.json |   18 +
+ .../cursor-app-control/tools/cursor_dialog.json    |  147 ++
+ .../cursor-app-control/tools/install_plugin.json   |   20 +
+ .../tools/move_agent_to_cloned_root.json           |   41 +
+ .../tools/move_agent_to_root.json                  |   41 +
+ .../cursor-app-control/tools/open_automation.json  |   40 +
+ .../cursor-app-control/tools/open_resource.json    |   19 +
+ .../mcps/cursor-app-control/tools/rename_chat.json |   20 +
+ .../mcps/cursor-origin/SERVER_METADATA.json        |    4 +
+ projects/empty-window/mcps/cursor-origin/STATUS.md |    1 +
+ .../mcps/cursor-subscriptions/INSTRUCTIONS.md      |    1 +
+ .../mcps/cursor-subscriptions/SERVER_METADATA.json |    4 +
+ .../tools/list_subscriptions.json                  |    8 +
+ .../tools/subscribe_github_ci.json                 |   30 +
+ .../tools/subscribe_github_pr.json                 |   91 +
+ .../tools/subscribe_linear_comment.json            |   51 +
+ .../tools/subscribe_linear_issue.json              |   67 +
+ .../tools/subscribe_origin_ci.json                 |   53 +
+ .../tools/subscribe_origin_pr.json                 |   73 +
+ .../tools/subscribe_slack_channel.json             |   22 +
+ .../tools/subscribe_slack_new_channels.json        |   16 +
+ .../tools/subscribe_slack_thread.json              |   22 +
+ .../cursor-subscriptions/tools/unsubscribe.json    |   15 +
+ .../mcps/plugin-exa-exa/SERVER_METADATA.json       |    4 +
+ .../empty-window/mcps/plugin-exa-exa/STATUS.md     |    1 +
+ .../mcps/plugin-exa-exa/tools/mcp_auth.json        |    9 +
+ .../mcps/user-atlassian/INSTRUCTIONS.md            |   20 +
+ .../mcps/user-atlassian/SERVER_METADATA.json       |    4 +
+ .../mcps/user-atlassian/tools/addGraphContext.json |   47 +
+ .../tools/addOrEditJiraIssueComment.json           |   75 +
+ .../user-atlassian/tools/atlassianUserInfo.json    |    8 +
+ .../tools/createConfluenceContent.json             |   56 +
+ .../mcps/user-atlassian/tools/createJiraIssue.json |   71 +
+ .../mcps/user-atlassian/tools/discover.json        |   19 +
+ .../mcps/user-atlassian/tools/editJiraIssue.json   |   85 +
+ .../user-atlassian/tools/executeDestructive.json   |   42 +
+ .../mcps/user-atlassian/tools/executeRead.json     |   42 +
+ .../mcps/user-atlassian/tools/executeWrite.json    |   42 +
+ .../tools/getAccessibleAtlassianResources.json     |    8 +
+ .../user-atlassian/tools/getConfluenceContent.json |   54 +
+ .../mcps/user-atlassian/tools/getGraphContext.json |  100 +
+ .../mcps/user-atlassian/tools/getGraphObject.json  |   24 +
+ .../mcps/user-atlassian/tools/getJiraIssue.json    |   74 +
+ .../mcps/user-atlassian/tools/getLoomVideo.json    |   71 +
+ .../mcps/user-atlassian/tools/search.json          |   50 +
+ .../user-atlassian/tools/searchConfluence.json     |   43 +
+ .../tools/searchJiraIssuesUsingJql.json            |   70 +
+ .../user-atlassian/tools/transitionJiraIssue.json  |   68 +
+ .../tools/updateConfluenceContent.json             |   73 +
+ .../empty-window/mcps/user-github/INSTRUCTIONS.md  |   18 +
+ .../mcps/user-github/SERVER_METADATA.json          |    4 +
+ .../user-github/prompts/AssignCodingAgent.json     |    4 +
+ .../user-github/prompts/issue_to_fix_workflow.json |    4 +
+ .../mcps/user-github/resources/get_me_ui.json      |    6 +
+ .../mcps/user-github/resources/issue_write_ui.json |    6 +
+ .../mcps/user-github/resources/pr_edit_ui.json     |    6 +
+ .../mcps/user-github/resources/pr_write_ui.json    |    6 +
+ .../tools/add_comment_to_pending_review.json       |   71 +
+ .../mcps/user-github/tools/add_issue_comment.json  |   52 +
+ .../tools/add_reply_to_pull_request_comment.json   |   51 +
+ .../mcps/user-github/tools/create_branch.json      |   32 +
+ .../user-github/tools/create_or_update_file.json   |   52 +
+ .../user-github/tools/create_pull_request.json     |   57 +
+ .../mcps/user-github/tools/create_repository.json  |   33 +
+ .../mcps/user-github/tools/delete_file.json        |   38 +
+ .../mcps/user-github/tools/fork_repository.json    |   27 +
+ .../mcps/user-github/tools/get_commit.json         |   49 +
+ .../mcps/user-github/tools/get_file_contents.json  |   54 +
+ .../mcps/user-github/tools/get_label.json          |   28 +
+ .../mcps/user-github/tools/get_latest_release.json |   23 +
+ .../mcps/user-github/tools/get_me.json             |    8 +
+ .../mcps/user-github/tools/get_release_by_tag.json |   28 +
+ .../mcps/user-github/tools/get_tag.json            |   28 +
+ .../mcps/user-github/tools/get_team_members.json   |   21 +
+ .../mcps/user-github/tools/get_teams.json          |   13 +
+ .../mcps/user-github/tools/issue_read.json         |   51 +
+ .../mcps/user-github/tools/issue_write.json        |  141 ++
+ .../mcps/user-github/tools/list_branches.json      |   34 +
+ .../mcps/user-github/tools/list_commits.json       |   68 +
+ .../mcps/user-github/tools/list_issue_fields.json  |   22 +
+ .../mcps/user-github/tools/list_issue_types.json   |   22 +
+ .../mcps/user-github/tools/list_issues.json        |  110 +
+ .../mcps/user-github/tools/list_pull_requests.json |  103 +
+ .../mcps/user-github/tools/list_releases.json      |   52 +
+ .../tools/list_repository_collaborators.json       |   43 +
+ .../mcps/user-github/tools/list_tags.json          |   34 +
+ .../mcps/user-github/tools/merge_pull_request.json |   49 +
+ .../mcps/user-github/tools/pull_request_read.json  |   59 +
+ .../tools/pull_request_review_write.json           |   61 +
+ .../mcps/user-github/tools/push_files.json         |   56 +
+ .../user-github/tools/request_copilot_review.json  |   28 +
+ .../user-github/tools/run_secret_scanning.json     |   41 +
+ .../mcps/user-github/tools/search_code.json        |   53 +
+ .../mcps/user-github/tools/search_commits.json     |   43 +
+ .../mcps/user-github/tools/search_issues.json      |   95 +
+ .../user-github/tools/search_pull_requests.json    |   93 +
+ .../user-github/tools/search_repositories.json     |   50 +
+ .../mcps/user-github/tools/search_users.json       |   44 +
+ .../mcps/user-github/tools/sub_issue_write.json    |   50 +
+ .../mcps/user-github/tools/ui_get.json             |   36 +
+ .../user-github/tools/update_issue_comment.json    |   35 +
+ .../user-github/tools/update_pull_request.json     |   63 +
+ .../tools/update_pull_request_branch.json          |   32 +
+ skills-cursor/.sync-manifest.json                  |   81 +
+ skills-cursor/automate/SKILL.md                    |  379 +++
+ skills-cursor/autopilot/SKILL.md                   |   48 +
+ skills-cursor/canvas/SKILL.md                      |  113 +
+ skills-cursor/canvas/sdk/callout-tone-icons.d.ts   |   11 +
+ skills-cursor/canvas/sdk/canvas-tokens.d.ts        |  246 ++
+ skills-cursor/canvas/sdk/chart-primitives.d.ts     |  273 +++
+ skills-cursor/canvas/sdk/collapsible-section.d.ts  |   67 +
+ skills-cursor/canvas/sdk/dag-layout.d.ts           |  102 +
+ skills-cursor/canvas/sdk/diff-view.d.ts            |  130 ++
+ skills-cursor/canvas/sdk/form-primitives.d.ts      |  195 ++
+ skills-cursor/canvas/sdk/hooks.d.ts                |  174 ++
+ skills-cursor/canvas/sdk/index.d.ts                |   66 +
+ skills-cursor/canvas/sdk/swatch.d.ts               |   40 +
+ skills-cursor/canvas/sdk/theme.d.ts                |  108 +
+ skills-cursor/canvas/sdk/todo-list.d.ts            |   49 +
+ skills-cursor/canvas/sdk/ui-primitives.d.ts        |  570 +++++
+ skills-cursor/canvas/sdk/ui-primitives.test.d.ts   |    2 +
+ skills-cursor/canvas/sdk/usage-bar.d.ts            |   56 +
+ skills-cursor/create-hook/SKILL.md                 |  239 ++
+ skills-cursor/create-rule/SKILL.md                 |  164 ++
+ skills-cursor/create-skill/SKILL.md                |  504 ++++
+ skills-cursor/create-subagent/SKILL.md             |  225 ++
+ skills-cursor/goal/SKILL.md                        |   57 +
+ skills-cursor/loop/SKILL.md                        |  122 +
+ skills-cursor/migrate-to-skills/SKILL.md           |  134 ++
+ skills-cursor/new-repo/SKILL.md                    |   74 +
+ skills-cursor/onboard/SKILL.md                     |  176 ++
+ skills-cursor/origin/SKILL.md                      |   92 +
+ skills-cursor/rename-chat/SKILL.md                 |   16 +
+ skills-cursor/review-bugbot/SKILL.md               |   66 +
+ skills-cursor/review-security/SKILL.md             |   51 +
+ skills-cursor/review/SKILL.md                      |   16 +
+ skills-cursor/sdk/SKILL.md                         |  380 +++
+ skills-cursor/share/SKILL.md                       |   94 +
+ skills-cursor/shell/SKILL.md                       |   24 +
+ skills-cursor/split-to-prs/SKILL.md                |   49 +
+ skills-cursor/statusline/SKILL.md                  |  196 ++
+ skills-cursor/update-cli-config/SKILL.md           |   94 +
+ skills-cursor/update-cursor-settings/SKILL.md      |  122 +
+ skills-cursor/visualize/SKILL.md                   |  137 ++
+ skills-cursor/visualize/references/art.md          |   31 +
+ skills-cursor/visualize/references/catalog.md      |   69 +
+ skills-cursor/visualize/references/charts.md       |   59 +
+ skills-cursor/visualize/references/components.md   |  102 +
+ skills-cursor/visualize/references/diagrams.md     |   74 +
+ skills-cursor/visualize/references/foundations.md  |   80 +
+ skills-cursor/visualize/references/mockups.md      |   24 +
+ 877 files changed, 53606 insertions(+)
+commands/code-review.md
+commands/design-architecture.md
+commands/design-review.md
+commands/implementation-planning.md
+commands/implementation.md
+commands/jira-confluence-updater.md
+commands/pr-using-agentic-sdlc.md
+commands/requirement-analysis.md
+commands/sdlc-orchestrator.md
+commands/verify.md
+plans/hari-agents/architecture.md
+plans/hari-agents/impl-plan.md
+plans/hari-agents/index.html
+plans/hari-agents/requirements.md
+plans/hari-agents/styles.css
+plans/hari-agents/welcome-page.test.mjs
+plugins/cache/cursor-public/github/adf3218ca2f5b9971eedc07a76bef22df7701539/.cache-complete
+plugins/cache/cursor-public/github/adf3218ca2f5b9971eedc07a76bef22df7701539/.cursor-plugin/plugin.json
+plugins/cache/cursor-public/github/adf3218ca2f5b9971eedc07a76bef22df7701539/CHANGELOG.md
+plugins/cache/cursor-public/github/adf3218ca2f5b9971eedc07a76bef22df7701539/LICENSE
+plugins/cache/cursor-public/github/adf3218ca2f5b9971eedc07a76bef22df7701539/README.md
+plugins/cache/cursor-public/github/adf3218ca2f5b9971eedc07a76bef22df7701539/assets/logo.svg
+plugins/cache/cursor-public/github/adf3218ca2f5b9971eedc07a76bef22df7701539/mcp.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/SERVER_METADATA.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_click.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_close.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_console_messages.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_drag.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_drop.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_evaluate.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_file_upload.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_fill_form.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_handle_dialog.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_hover.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_navigate.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_navigate_back.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_network_request.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_network_requests.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_press_key.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_resize.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_run_code_unsafe.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_select_option.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_snapshot.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_tabs.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_take_screenshot.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_type.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-67630dc4-3a1d-4173-85ab-ae5bb6485082/mcps/user-Playwright/tools/browser_wait_for.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/INSTRUCTIONS.md
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/SERVER_METADATA.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/tools/browser_cdp.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/tools/browser_click.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/tools/browser_drag.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/tools/browser_fill.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/tools/browser_get_bounding_box.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/tools/browser_highlight.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/tools/browser_lock.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/tools/browser_mouse_click_xy.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/tools/browser_navigate.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/tools/browser_press_key.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/tools/browser_scroll.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/tools/browser_select_option.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/tools/browser_snapshot.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/tools/browser_tabs.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/tools/browser_take_screenshot.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-ide-browser/tools/browser_type.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-origin-readonly/INSTRUCTIONS.md
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-origin-readonly/SERVER_METADATA.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-origin-readonly/tools/checks_read.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-origin-readonly/tools/commit_read.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-origin-readonly/tools/compare_commits.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-origin-readonly/tools/get_file_contents.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-origin-readonly/tools/get_git_tree.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-origin-readonly/tools/get_repository.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-origin-readonly/tools/grep_contents.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-origin-readonly/tools/list_branches.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-origin-readonly/tools/list_commits.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-origin-readonly/tools/list_namespaces.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-origin-readonly/tools/list_pull_requests.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-origin-readonly/tools/list_repositories.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/cursor-origin-readonly/tools/pull_request_read.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/SERVER_METADATA.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_click.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_close.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_console_messages.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_drag.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_drop.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_emulate_media.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_evaluate.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_file_upload.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_fill_form.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_find.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_handle_dialog.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_hover.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_navigate.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_navigate_back.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_network_request.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_network_requests.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_press_key.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_resize.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_run_code_unsafe.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_select_option.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_snapshot.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_tabs.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_take_screenshot.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_type.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-Playwright/tools/browser_wait_for.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/INSTRUCTIONS.md
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/SERVER_METADATA.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/addGraphContext.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/addOrEditJiraIssueComment.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/atlassianUserInfo.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/createConfluenceContent.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/createJiraIssue.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/discover.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/editJiraIssue.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/executeDestructive.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/executeRead.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/executeWrite.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/getAccessibleAtlassianResources.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/getConfluenceContent.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/getGraphContext.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/getGraphObject.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/getJiraIssue.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/getLoomVideo.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/search.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/searchConfluence.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/searchJiraIssuesUsingJql.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/transitionJiraIssue.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-atlassian/tools/updateConfluenceContent.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/INSTRUCTIONS.md
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/SERVER_METADATA.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/prompts/AssignCodingAgent.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/prompts/issue_to_fix_workflow.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/resources/get_me_ui.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/resources/issue_write_ui.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/resources/pr_edit_ui.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/resources/pr_write_ui.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/add_comment_to_pending_review.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/add_issue_comment.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/add_reply_to_pull_request_comment.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/create_branch.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/create_or_update_file.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/create_pull_request.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/create_repository.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/delete_file.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/fork_repository.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/get_commit.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/get_file_contents.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/get_label.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/get_latest_release.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/get_me.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/get_release_by_tag.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/get_tag.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/get_team_members.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/get_teams.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/issue_read.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/issue_write.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/list_branches.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/list_commits.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/list_issue_fields.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/list_issue_types.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/list_issues.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/list_pull_requests.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/list_releases.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/list_repository_collaborators.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/list_tags.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/merge_pull_request.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/pull_request_read.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/pull_request_review_write.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/push_files.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/request_copilot_review.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/run_secret_scanning.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/search_code.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/search_commits.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/search_issues.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/search_pull_requests.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/search_repositories.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/search_users.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/sub_issue_write.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/update_issue_comment.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/update_pull_request.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-69518516-da6b-489e-9f65-b75938411d14/mcps/user-github/tools/update_pull_request_branch.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/SERVER_METADATA.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_click.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_close.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_console_messages.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_drag.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_drop.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_evaluate.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_file_upload.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_fill_form.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_handle_dialog.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_hover.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_navigate.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_navigate_back.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_network_request.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_network_requests.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_press_key.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_resize.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_run_code_unsafe.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_select_option.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_snapshot.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_tabs.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_take_screenshot.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_type.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-78dc02ab-bb9f-4130-b563-1dd043e20365/mcps/user-Playwright/tools/browser_wait_for.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/SERVER_METADATA.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_click.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_close.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_console_messages.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_drag.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_drop.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_evaluate.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_file_upload.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_fill_form.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_handle_dialog.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_hover.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_navigate.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_navigate_back.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_network_request.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_network_requests.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_press_key.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_resize.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_run_code_unsafe.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_select_option.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_snapshot.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_tabs.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_take_screenshot.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_type.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-8aeb0557-98e3-4fa6-a51b-1eec03bc527e/mcps/user-Playwright/tools/browser_wait_for.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/INSTRUCTIONS.md
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/SERVER_METADATA.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/tools/browser_cdp.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/tools/browser_click.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/tools/browser_drag.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/tools/browser_fill.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/tools/browser_get_bounding_box.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/tools/browser_highlight.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/tools/browser_lock.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/tools/browser_mouse_click_xy.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/tools/browser_navigate.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/tools/browser_press_key.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/tools/browser_scroll.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/tools/browser_select_option.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/tools/browser_snapshot.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/tools/browser_tabs.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/tools/browser_take_screenshot.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-ide-browser/tools/browser_type.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-origin-readonly/INSTRUCTIONS.md
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-origin-readonly/SERVER_METADATA.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-origin-readonly/tools/checks_read.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-origin-readonly/tools/commit_read.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-origin-readonly/tools/compare_commits.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-origin-readonly/tools/get_file_contents.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-origin-readonly/tools/get_git_tree.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-origin-readonly/tools/get_repository.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-origin-readonly/tools/grep_contents.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-origin-readonly/tools/list_branches.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-origin-readonly/tools/list_commits.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-origin-readonly/tools/list_namespaces.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-origin-readonly/tools/list_pull_requests.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-origin-readonly/tools/list_repositories.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/cursor-origin-readonly/tools/pull_request_read.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/SERVER_METADATA.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_click.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_close.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_console_messages.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_drag.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_drop.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_emulate_media.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_evaluate.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_file_upload.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_fill_form.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_find.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_handle_dialog.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_hover.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_navigate.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_navigate_back.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_network_request.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_network_requests.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_press_key.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_resize.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_run_code_unsafe.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_select_option.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_snapshot.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_tabs.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_take_screenshot.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_type.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-Playwright/tools/browser_wait_for.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/INSTRUCTIONS.md
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/SERVER_METADATA.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/addGraphContext.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/addOrEditJiraIssueComment.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/atlassianUserInfo.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/createConfluenceContent.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/createJiraIssue.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/discover.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/editJiraIssue.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/executeDestructive.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/executeRead.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/executeWrite.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/getAccessibleAtlassianResources.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/getConfluenceContent.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/getGraphContext.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/getGraphObject.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/getJiraIssue.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/getLoomVideo.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/search.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/searchConfluence.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/searchJiraIssuesUsingJql.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/transitionJiraIssue.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-atlassian/tools/updateConfluenceContent.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/INSTRUCTIONS.md
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/SERVER_METADATA.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/prompts/AssignCodingAgent.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/prompts/issue_to_fix_workflow.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/resources/get_me_ui.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/resources/issue_write_ui.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/resources/pr_edit_ui.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/resources/pr_write_ui.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/add_comment_to_pending_review.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/add_issue_comment.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/add_reply_to_pull_request_comment.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/create_branch.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/create_or_update_file.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/create_pull_request.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/create_repository.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/delete_file.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/fork_repository.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/get_commit.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/get_file_contents.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/get_label.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/get_latest_release.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/get_me.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/get_release_by_tag.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/get_tag.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/get_team_members.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/get_teams.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/issue_read.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/issue_write.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/list_branches.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/list_commits.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/list_issue_fields.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/list_issue_types.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/list_issues.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/list_pull_requests.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/list_releases.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/list_repository_collaborators.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/list_tags.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/merge_pull_request.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/pull_request_read.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/pull_request_review_write.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/push_files.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/request_copilot_review.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/run_secret_scanning.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/search_code.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/search_commits.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/search_issues.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/search_pull_requests.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/search_repositories.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/search_users.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/sub_issue_write.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/update_issue_comment.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/update_pull_request.json
+projects/C-Users-HARIPR-1-AppData-Local-Temp-bfc9d219-0eae-459e-ad56-5274e7b47cff/mcps/user-github/tools/update_pull_request_branch.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/INSTRUCTIONS.md
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/SERVER_METADATA.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/tools/browser_cdp.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/tools/browser_click.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/tools/browser_drag.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/tools/browser_fill.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/tools/browser_get_bounding_box.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/tools/browser_highlight.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/tools/browser_lock.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/tools/browser_mouse_click_xy.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/tools/browser_navigate.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/tools/browser_press_key.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/tools/browser_scroll.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/tools/browser_select_option.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/tools/browser_snapshot.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/tools/browser_tabs.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/tools/browser_take_screenshot.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-ide-browser/tools/browser_type.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-origin-readonly/INSTRUCTIONS.md
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-origin-readonly/SERVER_METADATA.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-origin-readonly/tools/checks_read.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-origin-readonly/tools/commit_read.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-origin-readonly/tools/compare_commits.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-origin-readonly/tools/get_file_contents.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-origin-readonly/tools/get_git_tree.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-origin-readonly/tools/get_repository.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-origin-readonly/tools/grep_contents.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-origin-readonly/tools/list_branches.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-origin-readonly/tools/list_commits.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-origin-readonly/tools/list_namespaces.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-origin-readonly/tools/list_pull_requests.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-origin-readonly/tools/list_repositories.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/cursor-origin-readonly/tools/pull_request_read.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/SERVER_METADATA.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_click.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_close.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_console_messages.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_drag.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_drop.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_emulate_media.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_evaluate.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_file_upload.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_fill_form.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_find.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_handle_dialog.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_hover.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_navigate.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_navigate_back.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_network_request.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_network_requests.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_press_key.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_resize.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_run_code_unsafe.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_select_option.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_snapshot.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_tabs.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_take_screenshot.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_type.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-Playwright/tools/browser_wait_for.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/INSTRUCTIONS.md
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/SERVER_METADATA.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/addGraphContext.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/addOrEditJiraIssueComment.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/atlassianUserInfo.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/createConfluenceContent.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/createJiraIssue.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/discover.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/editJiraIssue.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/executeDestructive.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/executeRead.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/executeWrite.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/getAccessibleAtlassianResources.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/getConfluenceContent.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/getGraphContext.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/getGraphObject.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/getJiraIssue.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/getLoomVideo.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/search.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/searchConfluence.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/searchJiraIssuesUsingJql.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/transitionJiraIssue.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-atlassian/tools/updateConfluenceContent.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/INSTRUCTIONS.md
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/SERVER_METADATA.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/prompts/AssignCodingAgent.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/prompts/issue_to_fix_workflow.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/resources/get_me_ui.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/resources/issue_write_ui.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/resources/pr_edit_ui.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/resources/pr_write_ui.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/add_comment_to_pending_review.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/add_issue_comment.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/add_reply_to_pull_request_comment.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/create_branch.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/create_or_update_file.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/create_pull_request.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/create_repository.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/delete_file.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/fork_repository.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/get_commit.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/get_file_contents.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/get_label.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/get_latest_release.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/get_me.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/get_release_by_tag.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/get_tag.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/get_team_members.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/get_teams.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/issue_read.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/issue_write.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/list_branches.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/list_commits.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/list_issue_fields.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/list_issue_types.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/list_issues.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/list_pull_requests.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/list_releases.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/list_repository_collaborators.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/list_tags.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/merge_pull_request.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/pull_request_read.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/pull_request_review_write.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/push_files.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/request_copilot_review.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/run_secret_scanning.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/search_code.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/search_commits.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/search_issues.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/search_pull_requests.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/search_repositories.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/search_users.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/sub_issue_write.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/update_issue_comment.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/update_pull_request.json
+projects/c-Users-Hariprasanth-Baskara-OneDrive-EPAM-Learnings-QE-with-AI-capstone/mcps/user-github/tools/update_pull_request_branch.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/agent-transcripts/2588dac5-3bba-4ca8-9e84-09f97e16ba14/2588dac5-3bba-4ca8-9e84-09f97e16ba14.jsonl
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/INSTRUCTIONS.md
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/SERVER_METADATA.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/tools/browser_cdp.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/tools/browser_click.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/tools/browser_drag.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/tools/browser_fill.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/tools/browser_get_bounding_box.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/tools/browser_highlight.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/tools/browser_lock.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/tools/browser_mouse_click_xy.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/tools/browser_navigate.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/tools/browser_press_key.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/tools/browser_scroll.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/tools/browser_select_option.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/tools/browser_snapshot.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/tools/browser_tabs.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/tools/browser_take_screenshot.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-ide-browser/tools/browser_type.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-origin-readonly/INSTRUCTIONS.md
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-origin-readonly/SERVER_METADATA.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-origin-readonly/tools/checks_read.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-origin-readonly/tools/commit_read.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-origin-readonly/tools/compare_commits.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-origin-readonly/tools/get_file_contents.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-origin-readonly/tools/get_git_tree.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-origin-readonly/tools/get_repository.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-origin-readonly/tools/grep_contents.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-origin-readonly/tools/list_branches.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-origin-readonly/tools/list_commits.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-origin-readonly/tools/list_namespaces.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-origin-readonly/tools/list_pull_requests.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-origin-readonly/tools/list_repositories.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/cursor-origin-readonly/tools/pull_request_read.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/plugin-exa-exa/SERVER_METADATA.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/plugin-exa-exa/STATUS.md
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/plugin-exa-exa/tools/mcp_auth.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/INSTRUCTIONS.md
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/SERVER_METADATA.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/addGraphContext.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/addOrEditJiraIssueComment.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/atlassianUserInfo.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/createConfluenceContent.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/createJiraIssue.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/discover.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/editJiraIssue.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/executeDestructive.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/executeRead.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/executeWrite.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/getAccessibleAtlassianResources.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/getConfluenceContent.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/getGraphContext.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/getGraphObject.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/getJiraIssue.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/getLoomVideo.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/search.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/searchConfluence.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/searchJiraIssuesUsingJql.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/transitionJiraIssue.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-atlassian/tools/updateConfluenceContent.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/INSTRUCTIONS.md
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/SERVER_METADATA.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/prompts/AssignCodingAgent.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/prompts/issue_to_fix_workflow.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/resources/get_me_ui.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/resources/issue_write_ui.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/resources/pr_edit_ui.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/resources/pr_write_ui.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/add_comment_to_pending_review.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/add_issue_comment.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/add_reply_to_pull_request_comment.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/create_branch.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/create_or_update_file.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/create_pull_request.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/create_repository.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/delete_file.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/fork_repository.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/get_commit.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/get_file_contents.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/get_label.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/get_latest_release.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/get_me.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/get_release_by_tag.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/get_tag.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/get_team_members.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/get_teams.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/issue_read.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/issue_write.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/list_branches.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/list_commits.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/list_issue_fields.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/list_issue_types.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/list_issues.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/list_pull_requests.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/list_releases.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/list_repository_collaborators.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/list_tags.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/merge_pull_request.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/pull_request_read.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/pull_request_review_write.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/push_files.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/request_copilot_review.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/run_secret_scanning.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/search_code.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/search_commits.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/search_issues.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/search_pull_requests.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/search_repositories.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/search_users.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/sub_issue_write.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/update_issue_comment.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/update_pull_request.json
+projects/c-Users-Hariprasanth-Baskara-cursor-cursor/mcps/user-github/tools/update_pull_request_branch.json
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-tools/086a3169-efde-4ff0-988b-1148e8a730ba.txt
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-tools/08ba3d76-761c-43c6-8c74-cce3ed271952.txt
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-tools/0d2d564f-4778-4b1a-97e1-fd16ea7c088d.txt
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-tools/0ee9c7b2-ea87-45a6-820a-8c159bbc9b21.txt
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-tools/27c63618-6a31-4e5c-8b49-ff5c37fc1b0d.txt
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-tools/70eafeea-4be5-4d46-8c23-4a9604c1790e.txt
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-tools/75a68f91-47f4-4e4d-b692-e0c6285f2bea.txt
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-tools/87790524-1efb-4f64-91c8-ee4d2d5764b7.txt
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-tools/88e9e010-fb17-43f0-bd7f-f8f87050e89c.txt
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-tools/ace36236-645d-4682-896f-18ad7c332493.txt
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-tools/c0bf562d-3753-4a2c-91f0-b95b5f566989.txt
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-tools/c316998e-f31f-4b10-809a-afb923e791ad.txt
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-tools/e25e0da9-76ef-4138-add5-cd7731787818.txt
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-transcripts/45ba8fc1-39cb-4f6a-bcec-7a41000d2e6b/45ba8fc1-39cb-4f6a-bcec-7a41000d2e6b.jsonl
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-transcripts/45ba8fc1-39cb-4f6a-bcec-7a41000d2e6b/subagents/23c22811-80f3-408e-bfbc-b59c33c2a1ca.jsonl
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-transcripts/45ba8fc1-39cb-4f6a-bcec-7a41000d2e6b/subagents/2bd7ed39-eb3c-4fbf-9354-f979d8c0f608.jsonl
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-transcripts/45ba8fc1-39cb-4f6a-bcec-7a41000d2e6b/subagents/412c2aa2-81f4-436a-b562-15e7dc325ae3.jsonl
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-transcripts/45ba8fc1-39cb-4f6a-bcec-7a41000d2e6b/subagents/4a374688-04e2-49b6-9144-f83e9310c993.jsonl
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-transcripts/45ba8fc1-39cb-4f6a-bcec-7a41000d2e6b/subagents/4a3c2850-c8a3-4e9e-ba65-933b0f075735.jsonl
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-transcripts/45ba8fc1-39cb-4f6a-bcec-7a41000d2e6b/subagents/59168805-c229-4cde-bae0-0149544f866d.jsonl
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-transcripts/45ba8fc1-39cb-4f6a-bcec-7a41000d2e6b/subagents/79e5e769-b425-446f-94c2-053c39cd9658.jsonl
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-transcripts/676376ba-c82a-4fc2-9747-685626a38d26/676376ba-c82a-4fc2-9747-685626a38d26.jsonl
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-transcripts/b57dfe44-ab38-4b99-b44d-403d971768ce/b57dfe44-ab38-4b99-b44d-403d971768ce.jsonl
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-transcripts/b7af7521-0cad-4c79-b027-b3f67cf6ef05/b7af7521-0cad-4c79-b027-b3f67cf6ef05.jsonl
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-transcripts/d5ffa147-5248-41c2-8142-2e8b1e4c2f2b/d5ffa147-5248-41c2-8142-2e8b1e4c2f2b.jsonl
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-transcripts/d5ffa147-5248-41c2-8142-2e8b1e4c2f2b/subagents/133a9cd6-7287-49e8-b084-f1909188eb85.jsonl
+projects/c-Users-Hariprasanth-Baskara-cursor/agent-transcripts/fa83f5b4-d5c4-4980-9ff2-3ce501056ffa/fa83f5b4-d5c4-4980-9ff2-3ce501056ffa.jsonl
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/cursor-origin/SERVER_METADATA.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/cursor-origin/STATUS.md
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/plugin-exa-exa/SERVER_METADATA.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/plugin-exa-exa/STATUS.md
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/plugin-exa-exa/tools/mcp_auth.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/INSTRUCTIONS.md
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/SERVER_METADATA.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/addGraphContext.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/addOrEditJiraIssueComment.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/atlassianUserInfo.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/createConfluenceContent.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/createJiraIssue.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/discover.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/editJiraIssue.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/executeDestructive.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/executeRead.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/executeWrite.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/getAccessibleAtlassianResources.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/getConfluenceContent.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/getGraphContext.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/getGraphObject.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/getJiraIssue.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/getLoomVideo.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/search.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/searchConfluence.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/searchJiraIssuesUsingJql.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/transitionJiraIssue.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-atlassian/tools/updateConfluenceContent.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/INSTRUCTIONS.md
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/SERVER_METADATA.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/prompts/AssignCodingAgent.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/prompts/issue_to_fix_workflow.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/resources/get_me_ui.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/resources/issue_write_ui.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/resources/pr_edit_ui.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/resources/pr_write_ui.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/add_comment_to_pending_review.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/add_issue_comment.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/add_reply_to_pull_request_comment.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/create_branch.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/create_or_update_file.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/create_pull_request.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/create_repository.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/delete_file.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/fork_repository.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/get_commit.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/get_file_contents.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/get_label.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/get_latest_release.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/get_me.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/get_release_by_tag.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/get_tag.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/get_team_members.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/get_teams.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/issue_read.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/issue_write.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/list_branches.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/list_commits.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/list_issue_fields.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/list_issue_types.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/list_issues.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/list_pull_requests.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/list_releases.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/list_repository_collaborators.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/list_tags.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/merge_pull_request.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/pull_request_read.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/pull_request_review_write.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/push_files.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/request_copilot_review.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/run_secret_scanning.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/search_code.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/search_commits.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/search_issues.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/search_pull_requests.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/search_repositories.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/search_users.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/sub_issue_write.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/ui_get.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/update_issue_comment.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/update_pull_request.json
+projects/c-Users-Hariprasanth-Baskara-cursor/mcps/user-github/tools/update_pull_request_branch.json
+projects/empty-window/agent-tools/08dcefad-fd14-4d50-ac94-7b1ac668ac5b.txt
+projects/empty-window/agent-tools/0ef44045-d775-4508-a09f-9fca9ac84536.txt
+projects/empty-window/agent-tools/65b42282-bf50-4796-b990-402589a959de.txt
+projects/empty-window/agent-tools/e81219a1-c267-44ab-91ab-434cbd8622e1.txt
+projects/empty-window/agent-tools/ebde0599-6d1e-42d4-b68a-fe20205c07f9.txt
+projects/empty-window/agent-transcripts/7153c856-f874-47f5-af4d-08a48fb578cd/7153c856-f874-47f5-af4d-08a48fb578cd.jsonl
+projects/empty-window/agent-transcripts/7153c856-f874-47f5-af4d-08a48fb578cd/subagents/a67b6f0d-5890-4162-9c4d-7828a934e302.jsonl
+projects/empty-window/agent-transcripts/78cdca08-e84e-48f6-8ff3-42a5ecc604b4/78cdca08-e84e-48f6-8ff3-42a5ecc604b4.jsonl
+projects/empty-window/mcps/cursor-app-control/INSTRUCTIONS.md
+projects/empty-window/mcps/cursor-app-control/SERVER_METADATA.json
+projects/empty-window/mcps/cursor-app-control/tools/create_repo.json
+projects/empty-window/mcps/cursor-app-control/tools/cursor_dialog.json
+projects/empty-window/mcps/cursor-app-control/tools/install_plugin.json
+projects/empty-window/mcps/cursor-app-control/tools/move_agent_to_cloned_root.json
+projects/empty-window/mcps/cursor-app-control/tools/move_agent_to_root.json
+projects/empty-window/mcps/cursor-app-control/tools/open_automation.json
+projects/empty-window/mcps/cursor-app-control/tools/open_resource.json
+projects/empty-window/mcps/cursor-app-control/tools/rename_chat.json
+projects/empty-window/mcps/cursor-origin/SERVER_METADATA.json
+projects/empty-window/mcps/cursor-origin/STATUS.md
+projects/empty-window/mcps/cursor-subscriptions/INSTRUCTIONS.md
+projects/empty-window/mcps/cursor-subscriptions/SERVER_METADATA.json
+projects/empty-window/mcps/cursor-subscriptions/tools/list_subscriptions.json
+projects/empty-window/mcps/cursor-subscriptions/tools/subscribe_github_ci.json
+projects/empty-window/mcps/cursor-subscriptions/tools/subscribe_github_pr.json
+projects/empty-window/mcps/cursor-subscriptions/tools/subscribe_linear_comment.json
+projects/empty-window/mcps/cursor-subscriptions/tools/subscribe_linear_issue.json
+projects/empty-window/mcps/cursor-subscriptions/tools/subscribe_origin_ci.json
+projects/empty-window/mcps/cursor-subscriptions/tools/subscribe_origin_pr.json
+projects/empty-window/mcps/cursor-subscriptions/tools/subscribe_slack_channel.json
+projects/empty-window/mcps/cursor-subscriptions/tools/subscribe_slack_new_channels.json
+projects/empty-window/mcps/cursor-subscriptions/tools/subscribe_slack_thread.json
+projects/empty-window/mcps/cursor-subscriptions/tools/unsubscribe.json
+projects/empty-window/mcps/plugin-exa-exa/SERVER_METADATA.json
+projects/empty-window/mcps/plugin-exa-exa/STATUS.md
+projects/empty-window/mcps/plugin-exa-exa/tools/mcp_auth.json
+projects/empty-window/mcps/user-atlassian/INSTRUCTIONS.md
+projects/empty-window/mcps/user-atlassian/SERVER_METADATA.json
+projects/empty-window/mcps/user-atlassian/tools/addGraphContext.json
+projects/empty-window/mcps/user-atlassian/tools/addOrEditJiraIssueComment.json
+projects/empty-window/mcps/user-atlassian/tools/atlassianUserInfo.json
+projects/empty-window/mcps/user-atlassian/tools/createConfluenceContent.json
+projects/empty-window/mcps/user-atlassian/tools/createJiraIssue.json
+projects/empty-window/mcps/user-atlassian/tools/discover.json
+projects/empty-window/mcps/user-atlassian/tools/editJiraIssue.json
+projects/empty-window/mcps/user-atlassian/tools/executeDestructive.json
+projects/empty-window/mcps/user-atlassian/tools/executeRead.json
+projects/empty-window/mcps/user-atlassian/tools/executeWrite.json
+projects/empty-window/mcps/user-atlassian/tools/getAccessibleAtlassianResources.json
+projects/empty-window/mcps/user-atlassian/tools/getConfluenceContent.json
+projects/empty-window/mcps/user-atlassian/tools/getGraphContext.json
+projects/empty-window/mcps/user-atlassian/tools/getGraphObject.json
+projects/empty-window/mcps/user-atlassian/tools/getJiraIssue.json
+projects/empty-window/mcps/user-atlassian/tools/getLoomVideo.json
+projects/empty-window/mcps/user-atlassian/tools/search.json
+projects/empty-window/mcps/user-atlassian/tools/searchConfluence.json
+projects/empty-window/mcps/user-atlassian/tools/searchJiraIssuesUsingJql.json
+projects/empty-window/mcps/user-atlassian/tools/transitionJiraIssue.json
+projects/empty-window/mcps/user-atlassian/tools/updateConfluenceContent.json
+projects/empty-window/mcps/user-github/INSTRUCTIONS.md
+projects/empty-window/mcps/user-github/SERVER_METADATA.json
+projects/empty-window/mcps/user-github/prompts/AssignCodingAgent.json
+projects/empty-window/mcps/user-github/prompts/issue_to_fix_workflow.json
+projects/empty-window/mcps/user-github/resources/get_me_ui.json
+projects/empty-window/mcps/user-github/resources/issue_write_ui.json
+projects/empty-window/mcps/user-github/resources/pr_edit_ui.json
+projects/empty-window/mcps/user-github/resources/pr_write_ui.json
+projects/empty-window/mcps/user-github/tools/add_comment_to_pending_review.json
+projects/empty-window/mcps/user-github/tools/add_issue_comment.json
+projects/empty-window/mcps/user-github/tools/add_reply_to_pull_request_comment.json
+projects/empty-window/mcps/user-github/tools/create_branch.json
+projects/empty-window/mcps/user-github/tools/create_or_update_file.json
+projects/empty-window/mcps/user-github/tools/create_pull_request.json
+projects/empty-window/mcps/user-github/tools/create_repository.json
+projects/empty-window/mcps/user-github/tools/delete_file.json
+projects/empty-window/mcps/user-github/tools/fork_repository.json
+projects/empty-window/mcps/user-github/tools/get_commit.json
+projects/empty-window/mcps/user-github/tools/get_file_contents.json
+projects/empty-window/mcps/user-github/tools/get_label.json
+projects/empty-window/mcps/user-github/tools/get_latest_release.json
+projects/empty-window/mcps/user-github/tools/get_me.json
+projects/empty-window/mcps/user-github/tools/get_release_by_tag.json
+projects/empty-window/mcps/user-github/tools/get_tag.json
+projects/empty-window/mcps/user-github/tools/get_team_members.json
+projects/empty-window/mcps/user-github/tools/get_teams.json
+projects/empty-window/mcps/user-github/tools/issue_read.json
+projects/empty-window/mcps/user-github/tools/issue_write.json
+projects/empty-window/mcps/user-github/tools/list_branches.json
+projects/empty-window/mcps/user-github/tools/list_commits.json
+projects/empty-window/mcps/user-github/tools/list_issue_fields.json
+projects/empty-window/mcps/user-github/tools/list_issue_types.json
+projects/empty-window/mcps/user-github/tools/list_issues.json
+projects/empty-window/mcps/user-github/tools/list_pull_requests.json
+projects/empty-window/mcps/user-github/tools/list_releases.json
+projects/empty-window/mcps/user-github/tools/list_repository_collaborators.json
+projects/empty-window/mcps/user-github/tools/list_tags.json
+projects/empty-window/mcps/user-github/tools/merge_pull_request.json
+projects/empty-window/mcps/user-github/tools/pull_request_read.json
+projects/empty-window/mcps/user-github/tools/pull_request_review_write.json
+projects/empty-window/mcps/user-github/tools/push_files.json
+projects/empty-window/mcps/user-github/tools/request_copilot_review.json
+projects/empty-window/mcps/user-github/tools/run_secret_scanning.json
+projects/empty-window/mcps/user-github/tools/search_code.json
+projects/empty-window/mcps/user-github/tools/search_commits.json
+projects/empty-window/mcps/user-github/tools/search_issues.json
+projects/empty-window/mcps/user-github/tools/search_pull_requests.json
+projects/empty-window/mcps/user-github/tools/search_repositories.json
+projects/empty-window/mcps/user-github/tools/search_users.json
+projects/empty-window/mcps/user-github/tools/sub_issue_write.json
+projects/empty-window/mcps/user-github/tools/ui_get.json
+projects/empty-window/mcps/user-github/tools/update_issue_comment.json
+projects/empty-window/mcps/user-github/tools/update_pull_request.json
+projects/empty-window/mcps/user-github/tools/update_pull_request_branch.json
+requirements.md
+skills-cursor/.sync-manifest.json
+skills-cursor/automate/SKILL.md
+skills-cursor/autopilot/SKILL.md
+skills-cursor/canvas/SKILL.md
+skills-cursor/canvas/sdk/callout-tone-icons.d.ts
+skills-cursor/canvas/sdk/canvas-tokens.d.ts
+skills-cursor/canvas/sdk/chart-primitives.d.ts
+skills-cursor/canvas/sdk/collapsible-section.d.ts
+skills-cursor/canvas/sdk/dag-layout.d.ts
+skills-cursor/canvas/sdk/diff-view.d.ts
+skills-cursor/canvas/sdk/form-primitives.d.ts
+skills-cursor/canvas/sdk/hooks.d.ts
+skills-cursor/canvas/sdk/index.d.ts
+skills-cursor/canvas/sdk/swatch.d.ts
+skills-cursor/canvas/sdk/theme.d.ts
+skills-cursor/canvas/sdk/todo-list.d.ts
+skills-cursor/canvas/sdk/ui-primitives.d.ts
+skills-cursor/canvas/sdk/ui-primitives.test.d.ts
+skills-cursor/canvas/sdk/usage-bar.d.ts
+skills-cursor/create-hook/SKILL.md
+skills-cursor/create-rule/SKILL.md
+skills-cursor/create-skill/SKILL.md
+skills-cursor/create-subagent/SKILL.md
+skills-cursor/goal/SKILL.md
+skills-cursor/loop/SKILL.md
+skills-cursor/migrate-to-skills/SKILL.md
+skills-cursor/new-repo/SKILL.md
+skills-cursor/onboard/SKILL.md
+skills-cursor/origin/SKILL.md
+skills-cursor/rename-chat/SKILL.md
+skills-cursor/review-bugbot/SKILL.md
+skills-cursor/review-security/SKILL.md
+skills-cursor/review/SKILL.md
+skills-cursor/sdk/SKILL.md
+skills-cursor/share/SKILL.md
+skills-cursor/shell/SKILL.md
+skills-cursor/split-to-prs/SKILL.md
+skills-cursor/statusline/SKILL.md
+skills-cursor/update-cli-config/SKILL.md
+skills-cursor/update-cursor-settings/SKILL.md
+skills-cursor/visualize/SKILL.md
+skills-cursor/visualize/references/art.md
+skills-cursor/visualize/references/catalog.md
+skills-cursor/visualize/references/charts.md
+skills-cursor/visualize/references/components.md
+skills-cursor/visualize/references/diagrams.md
+skills-cursor/visualize/references/foundations.md
+skills-cursor/visualize/references/mockups.md
