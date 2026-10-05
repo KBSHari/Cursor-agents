@@ -2,9 +2,10 @@
 
 ## Document status
 
-- Status: Proposed
-- Design review: Not started
-- Ready for implementation: No (Design Review gates approval)
+- Status: Approved
+- Design review: Passed
+- Ready for implementation: Yes
+- Review date: 2026-10-05
 
 ### Allowed status values
 
@@ -16,7 +17,7 @@
 | Blocked | A finding or missing decision prevents safe progress. |
 | Superseded | Replaced by a later architecture document. |
 
-This document is **Proposed**. The SDLC Orchestrator invoked Design Architecture as part of the full sequence. Design Review is the approval gate. This status is not an implementation authorization.
+This document is **Approved**. Design Review passed on 2026-10-05 with no Critical or High blockers. Medium findings were resolved in this revision. Implementation planning may begin. Production HTML/CSS/tests still wait for `impl-plan.md`.
 
 ---
 
@@ -62,6 +63,9 @@ Workspace facts reinforce the choice: there is no existing HTML app, no `package
 | AD-7 | Zero-dependency `node --test` + `assert` on HTML file text | Workspace constraint; no npm. Tests are not a runtime component. |
 | AD-8 | Do not fold `US-LOGO-1` into this design | Confirmed separate draft; favicon/PWA/OG are out of scope. |
 | AD-9 | No backend, secrets, cookies, or user input | FR-6, FR-7, FR-8. |
+| AD-10 | No JavaScript in the delivered page | FR-7/FR-8 and NFR-3: the welcome surface needs no client script. C-TEST is not linked from HTML. |
+| AD-11 | Require a viewport meta tag | FR-11 / AC-FR-11.1: without `width=device-width`, ~375×667 layout width is unreliable. |
+| AD-12 | Default light palette `#ffffff` / `#1a1a1a` | Known WCAG 2.2 pass for normal text (well above 4.5:1). Brand colors were not specified; this is a conservative default, not a brand book. |
 
 ---
 
@@ -103,7 +107,8 @@ There is no user-generated data, no persistence, and no outbound application tra
 
 ### 2.5 Trust and ownership boundaries
 
-- **Trust boundary:** the local files the implementer controls. The browser must not load scripts, fonts, images, or pixels from untrusted origins.
+- **Runtime trust boundary:** `index.html` and `styles.css` only. The browser must not load scripts, fonts, images, or pixels from untrusted origins, and must not execute page JavaScript (AD-10).
+- **Verification artifacts:** `welcome-page.test.mjs` is first-party but is not a runtime asset and must not be linked or served to visitors.
 - **Ownership boundary:** Hari-Agents welcome files and SDLC docs in `plans/hari-agents/`. The rest of the Cursor config repo (commands, skills, plugins, `US-LOGO-1`) is adjacent configuration, not this product.
 - **No secrets** cross any boundary.
 
@@ -116,14 +121,17 @@ flowchart LR
     Implementer[Implementer]
     Browser[Web browser]
     Node[Node test runner]
-    subgraph Trust["Trust boundary: plans/hari-agents first-party files"]
+    subgraph RuntimeTrust["Runtime trust boundary: first-party page files"]
         Page[index.html]
         Style[styles.css]
+    end
+    subgraph VerifyFiles["Verification artifacts: not served"]
         Test[welcome-page.test.mjs]
     end
 
     Owner --> Browser
     Visitor --> Browser
+    Implementer --> Browser
     Browser -->|open file or optional static serve| Page
     Page -->|same-folder stylesheet| Style
     Implementer --> Node
@@ -150,9 +158,9 @@ flowchart LR
 
 | ID | Component | Responsibility | Does not do |
 |----|-----------|----------------|-------------|
-| C-PAGE | `index.html` | Document title exactly `Hari-Agents`; single `h1` whose accessible name is `Hari-Agents`; greeting containing `Welcome` and `Hari-Agents` (default: `Welcome to Hari-Agents`); branding line that this is a personal agent workspace (default: `A personal agent workspace.`); semantic landmark (`main`); link to same-folder CSS; no `form`; no analytics or third-party scripts. | Routing, data fetch, auth, logo system |
-| C-STYLE | `styles.css` | Light readable theme; WCAG 2.2 contrast (NFR-1); first-viewport composition on ~1280×800; wrapping without clipping heading/greeting at ~375×667; system fonts. | Business copy, tracking |
-| C-TEST | `welcome-page.test.mjs` | `node --test` + `node:assert` string checks on HTML: title, `h1`, greeting, absence of `form`, absence of analytics script markers. | Browser automation, visual regression, serving the page |
+| C-PAGE | `index.html` | Document title exactly `Hari-Agents`; `charset` and viewport meta (AD-11); single `h1` whose accessible name is `Hari-Agents`; greeting containing `Welcome` and `Hari-Agents` (default: `Welcome to Hari-Agents`); branding line that this is a personal agent workspace (default: `A personal agent workspace.`); semantic landmark (`main`); same-folder CSS only; no `form`; no `<script>`; no remote `href`/`src`. | Routing, data fetch, auth, logo system, page JS |
+| C-STYLE | `styles.css` | Light readable theme using default tokens `#ffffff` / `#1a1a1a` unless a later approved palette is supplied; WCAG 2.2 contrast (NFR-1); first-viewport composition on ~1280×800; wrapping without clipping heading/greeting at ~375×667; system fonts. | Business copy, tracking |
+| C-TEST | `welcome-page.test.mjs` | `node --test` + `node:assert` string checks on HTML: title, `h1`, greeting, viewport meta, absence of `form`, absence of `<script>` and analytics markers. | Browser automation, visual regression, serving the page |
 | C-BROWSER | Web browser | Renders C-PAGE + C-STYLE; shows tab title. Not authored. | — |
 | C-RUNNER | Node.js test runner | Optional local verification. Not required to view the page. | Production hosting |
 
@@ -169,7 +177,7 @@ flowchart TB
     end
 
     subgraph Verification["Implementer verification — not served"]
-        Node[C-RUNNER node --test]
+        Node[C-RUNNER node test]
         Test[C-TEST welcome-page.test.mjs]
         Node --> Test
         Test -->|string assertions| HTML
@@ -221,7 +229,7 @@ No application API call occurs. Missing CSS degrades presentation but the HTML w
 ```mermaid
 sequenceDiagram
     actor Implementer
-    participant Node as node --test
+    participant Node as node test runner
     participant Test as welcome-page.test.mjs
     participant HTML as index.html
 
@@ -229,7 +237,7 @@ sequenceDiagram
     Node->>Test: Execute
     Test->>HTML: fs.readFileSync
     HTML-->>Test: File text
-    Test-->>Node: Assert title h1 greeting no form no analytics
+    Test-->>Node: Assert title h1 greeting viewport no form no script
 ```
 
 C-TEST does not launch a browser and does not prove contrast or viewport layout. Those remain visual/NFR checks during implementation and verify stages.
@@ -246,7 +254,7 @@ C-TEST does not launch a browser and does not prove contrast or viewport layout.
 | Presentation | CSS3 file `styles.css` | FR-5, FR-10, FR-11 without a preprocessor. |
 | Fonts | System UI stack | No CDN; FR-8; works on `file://`. |
 | Language | English copy in HTML | Assumption A-6. |
-| Theme | Light readable colors | Assumption A-7; NFR-1. |
+| Theme | Light readable colors; default `#ffffff` / `#1a1a1a` | Assumption A-7; NFR-1; AD-12. |
 | Wordmark | Text in `h1` | Assumption A-8; FR-12. |
 | Package manager | None | No `package.json`; npm is unnecessary for this scope. |
 | Tests | `node:test` + `assert`, ESM `.mjs` | Zero extra dependencies; `node --test`. |
@@ -288,13 +296,17 @@ Implementation must not place the page at the Cursor repo root or in a new root 
 `index.html` shall contain, at minimum:
 
 - `<html lang="en">`
+- `<meta charset="utf-8">`
+- `<meta name="viewport" content="width=device-width, initial-scale=1">`
 - `<title>Hari-Agents</title>` exactly
-- `<link rel="stylesheet" href="styles.css">` (relative, same folder)
+- `<link rel="stylesheet" href="styles.css">` (relative, same folder; the only linked resource)
 - exactly one `<h1>Hari-Agents</h1>`
 - greeting text including `Welcome` and `Hari-Agents` (default sentence: `Welcome to Hari-Agents`)
 - branding line identifying a personal agent workspace (default: `A personal agent workspace.`)
+- a single `<main>` landmark wrapping heading, greeting, and branding line
 - no `<form>`
-- no analytics, tag-manager, or third-party `<script src>`
+- no `<script>` (inline or `src`)
+- no remote `href`, `src`, or `@import` (no CDN, analytics, fonts, or pixels)
 
 ### 7.2 Test contract
 
@@ -304,7 +316,7 @@ Implementation must not place the page at the Cursor repo root or in a new root 
 node --test welcome-page.test.mjs
 ```
 
-from `plans/hari-agents/` (or an equivalent path argument). Assertions operate on the HTML file string: title, `h1`, greeting, no `form`, no analytics script markers. No extra npm packages.
+from `plans/hari-agents/` (or an equivalent path argument). Assertions operate on the HTML file string: title, `h1`, greeting, viewport meta, no `form`, no `<script>`, no analytics markers. No extra npm packages.
 
 ---
 
@@ -313,7 +325,9 @@ from `plans/hari-agents/` (or an equivalent path argument). Assertions operate o
 | Topic | Design |
 |-------|--------|
 | Secrets | None. No API keys, tokens, or credentials in files. |
+| Page JavaScript | Forbidden in `index.html` (AD-10). No inline or external `<script>`. C-TEST is not linked from the page. |
 | Third-party scripts | Forbidden. No CDN JS, tag managers, or remote widgets. |
+| Remote assets | Forbidden. The only allowed stylesheet is same-folder `styles.css`. |
 | Tracking | Forbidden (FR-8). No analytics, pixels, cookies, or beacons. |
 | Input | No forms or writable fields (FR-7). No injection surface from visitors. |
 | Supply chain | No npm dependencies for the page or its test. |
@@ -343,8 +357,8 @@ Trust boundary is the local folder. Crossing it (remote script/font) would be a 
 | Requirement | Design response |
 |-------------|-----------------|
 | FR-9 / AC-FR-2.2 | Exactly one semantic `h1` with text `Hari-Agents`. |
-| FR-10 / NFR-1 | Light background, dark text; contrast ≥ 4.5:1 normal, ≥ 3:1 large. |
-| FR-11 | Fluid width, wrapping; no horizontal clip of heading/greeting at ~375×667. |
+| FR-10 / NFR-1 | Default canvas `#ffffff` and text `#1a1a1a` (AD-12); contrast ≥ 4.5:1 normal, ≥ 3:1 large. |
+| FR-11 | Viewport meta (AD-11); fluid width; wrapping; no horizontal clip of heading/greeting at ~375×667. |
 | Keyboard | Content is visible without interaction; no hidden-only-on-hover identity. |
 | Language | `lang="en"` on the root element. |
 | Motion / dark mode | Not requested (A-7); do not add a theme toggle in this release. |
@@ -367,7 +381,8 @@ Trust boundary is the local folder. Crossing it (remote script/font) would be a 
 | R-4 | Files placed at repo root are gitignored | AD-2: deliver under `plans/hari-agents/`. |
 | R-5 | Confusing this page with `US-LOGO-1` | AD-8; favicon/PWA/OG stay out. |
 | R-6 | `file://` CSS path mistakes | Same-folder relative `href="styles.css"`; keep files together. |
-| R-7 | Structure tests miss contrast/viewport | Document visual checks for NFR-1 and FR-11 in implementation/verify. |
+| R-7 | Structure tests miss contrast/viewport | Viewport meta is asserted by C-TEST (AD-11); contrast and 375-wide wrap remain visual/NFR checks. |
+| R-8 | Accidental page JavaScript or remote URL | AD-10 and HTML contract: no `<script>`, no remote `href`/`src`; C-TEST asserts no `<script>`. |
 
 ### 10.2 Trade-offs
 
@@ -384,6 +399,7 @@ Trust boundary is the local folder. Crossing it (remote script/font) would be a 
 | OD-3 | Any decorative mark besides text (req Q-3) | No | Text-only wordmark |
 | OD-4 | Visual direction beyond readable light UI (req Q-5) | No | Conservative system fonts and high-contrast neutrals |
 | OD-5 | Optional local static server vs `file://` only | No | `file://` is sufficient |
+| OD-6 | Later multi-page workspace (req Q-4) | No | This release is one static page only |
 
 **Blocking open decisions:** none. Defaults above are sufficient to implement FR-1 through FR-12.
 
@@ -400,7 +416,7 @@ Trust boundary is the local folder. Crossing it (remote script/font) would be a 
 | FR-5 First viewport on typical desktop; no click/form/API | C-PAGE + C-STYLE | Content in initial `main`; CSS centers/sizes for ~1280×800; no interaction required. |
 | FR-6 Static files; no backend/session | Delivery model | Only HTML/CSS; `file://` or optional static serve. |
 | FR-7 No input collection | C-PAGE | No `form` or required fields; C-TEST asserts no `form`. |
-| FR-8 No analytics/telemetry | C-PAGE + security rules | No third-party scripts; C-TEST asserts no analytics markers. |
+| FR-8 No analytics/telemetry | C-PAGE + security rules | No page scripts, no remote URLs; C-TEST asserts no `<script>` and no analytics markers. |
 | FR-9 Single semantic `h1` | C-PAGE | Exactly one `h1`; C-TEST asserts it. |
 | FR-10 Readable contrast | C-STYLE | Light theme meeting NFR-1; visual verify (not C-TEST). |
 | FR-11 Readable at ~1280×800 and ~375×667 | C-STYLE | Fluid layout, wrap, no clip of heading/greeting; visual verify. |
