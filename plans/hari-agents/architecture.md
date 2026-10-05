@@ -40,7 +40,7 @@ Workspace facts reinforce the choice: there is no existing HTML app, no `package
 | Product surface | `index.html` + `styles.css` | Auth, APIs, multi-page app, agent execution, Jira-in-page |
 | Delivery | Files under `plans/hari-agents/` | Repo-root product code, `US-LOGO-1` logo/PWA/favicon program |
 | Runtime | Browser rendering of static files | Node.js except the optional local test runner |
-| Trust | First-party local files only | Third-party scripts, fonts, analytics, remote assets |
+| Trust | First-party `index.html` + `styles.css` only | Third-party scripts, fonts, analytics, remote assets, page JS |
 
 ### 1.4 Primary actors and external systems
 
@@ -145,7 +145,7 @@ flowchart LR
 
 1. **Static first.** Required content is in the HTML file. No API, session, or build is needed to greet the visitor.
 2. **One page, one `h1`.** Identity is the product name as text, not a routed application.
-3. **No third-party runtime.** No remote scripts, fonts, analytics, or pixels.
+3. **No third-party runtime and no page JavaScript.** No remote scripts, fonts, analytics, or pixels; `index.html` contains no `<script>` (AD-10).
 4. **Text survives decoration.** If a later optional mark is added, the wordmark stays visible text (FR-12). This design does not require a mark.
 5. **Keep SDLC artifacts with the page.** Architecture, later impl-plan, page, styles, and tests live together under `plans/hari-agents/`.
 6. **Do not expand scope.** Auth, APIs, Jira-in-page, agent execution, PWA/favicon, and SPA stacks stay out.
@@ -190,7 +190,7 @@ flowchart TB
 |------|-------|-------------|-------|
 | Product name `Hari-Agents` | C-PAGE (`<title>`, `h1`, greeting) | Source files | Canonical identity is text. |
 | Greeting and tagline | C-PAGE | Source files | Defaults from Assumptions A-3 and A-4. |
-| Colors, spacing, typography | C-STYLE | Source files | Conservative light palette; no brand book. |
+| Colors, spacing, typography | C-STYLE | Source files | Default `#ffffff` / `#1a1a1a` (AD-12); no brand book. |
 | Visitor data | None | None | No collection (FR-7, FR-8). |
 
 There are no entities to persist, no write path, and no cache-coherence problem.
@@ -337,7 +337,7 @@ from `plans/hari-agents/` (or an equivalent path argument). Assertions operate o
 | Transport | `file://` has no network. If an optional static server is used later, it only serves these first-party files. |
 | Privacy | No personal data collected or stored. |
 
-Trust boundary is the local folder. Crossing it (remote script/font) would be a design violation, not an open option.
+Runtime trust boundary is `index.html` and `styles.css`. Crossing it (remote script, font, pixel, or page JavaScript) would be a design violation, not an open option.
 
 ---
 
@@ -418,15 +418,15 @@ Trust boundary is the local folder. Crossing it (remote script/font) would be a 
 | FR-7 No input collection | C-PAGE | No `form` or required fields; C-TEST asserts no `form`. |
 | FR-8 No analytics/telemetry | C-PAGE + security rules | No page scripts, no remote URLs; C-TEST asserts no `<script>` and no analytics markers. |
 | FR-9 Single semantic `h1` | C-PAGE | Exactly one `h1`; C-TEST asserts it. |
-| FR-10 Readable contrast | C-STYLE | Light theme meeting NFR-1; visual verify (not C-TEST). |
-| FR-11 Readable at ~1280×800 and ~375×667 | C-STYLE | Fluid layout, wrap, no clip of heading/greeting; visual verify. |
+| FR-10 Readable contrast | C-STYLE | Default `#ffffff` / `#1a1a1a` (AD-12) meeting NFR-1; visual verify (not C-TEST). |
+| FR-11 Readable at ~1280×800 and ~375×667 | C-PAGE + C-STYLE | Viewport meta (AD-11); fluid layout, wrap, no clip; visual verify of wrap. |
 | FR-12 Name remains text if decoration fails | C-PAGE | Product name is text; no required image. |
 
 ### 11.1 NFR coverage
 
 | NFR | Coverage |
 |-----|----------|
-| NFR-1 Contrast | C-STYLE palette; verify stage. |
+| NFR-1 Contrast | C-STYLE default `#ffffff` / `#1a1a1a` (AD-12); verify stage. |
 | NFR-2 Chromium file/static open | Reliability; no runtime besides the browser. |
 | NFR-3 Stack is an architecture choice | AD-1: HTML/CSS chosen; alternatives rejected. |
 
@@ -436,7 +436,7 @@ Out-of-scope items (auth, APIs, analytics, Jira-in-page, multi-page app, agent e
 
 ## 12. Assumptions consumed (not re-opened as product scope)
 
-- English copy; light readable styling; text wordmark is enough.
+- English copy; light readable styling with default `#ffffff` / `#1a1a1a`; text wordmark is enough.
 - Default greeting and tagline as in Assumptions A-3 and A-4.
 - Repo-root `requirements.md` remains a separate `US-LOGO-1` logo draft.
 - First browser target: current desktop Chrome or Edge.
@@ -447,15 +447,36 @@ Out-of-scope items (auth, APIs, analytics, Jira-in-page, multi-page app, agent e
 
 | Item | Value |
 |------|--------|
-| Current stage | Design Architecture |
-| Input artifact | Approved requirement analysis (Hari-Agents welcome page, FR-1..FR-12) |
-| Output artifact | `plans/hari-agents/architecture.md` (this file) |
-| Status | Proposed |
-| Next stage | Design Review |
-| Implementation | Must not start until status is Approved and Design Review has passed |
+| Current stage | Design Review complete |
+| Input artifact | Approved requirement analysis (Hari-Agents welcome page, FR-1..FR-12) and this architecture |
+| Output artifact | `plans/hari-agents/architecture.md` (this file, Approved) |
+| Status | Approved |
+| Design review | Passed |
+| Ready for implementation | Yes |
+| Next stage | Implementation Planning (`impl-plan.md`) |
+| Production coding | Must wait for Implementation Planning; architecture blockers are none |
 
 ---
 
 ## 14. Out of scope reminder
 
 Do not implement as part of this architecture: authentication, APIs, analytics, in-page Jira, multi-page navigation, agent execution, prescribed SPA stack, or the `US-LOGO-1` logo/PWA/favicon program.
+
+---
+
+## 15. Design Review findings (2026-10-05)
+
+Review status: **Ready for implementation**. Critical/High blockers: **none**. Medium findings below were resolved in this revision.
+
+| ID | Severity | Category | Finding | Resolution in this document |
+|----|----------|----------|---------|-----------------------------|
+| F-1 | Medium | Requirements / a11y | HTML contract omitted viewport meta required for reliable ~375×667 CSS width (FR-11). | AD-11; §7.1 viewport meta; C-PAGE / C-TEST updated. |
+| F-2 | Medium | Security | Contract forbade third-party/analytics scripts but not first-party page JS. | AD-10; no `<script>` in `index.html`; security table + C-TEST. |
+| F-3 | Medium | Diagrams | Context diagram placed `welcome-page.test.mjs` inside the runtime trust boundary. | §2.6 splits runtime files vs verification artifacts; Implementer also opens Browser. |
+| F-4 | Medium | Diagrams | Sequence alias `node --test` can break Mermaid (`--` is message syntax). | Aliases use `node test runner` / `C-RUNNER node test`. |
+| F-5 | Medium | Security / FR-8 | HTML contract did not explicitly ban remote `href`/`src` besides analytics markers. | §7.1: only same-folder `styles.css`; no remote URLs. |
+| F-6 | Medium | Technology / NFR-1 | Contrast ratios were stated without default tokens; implementers could pick failing gray. | AD-12: `#ffffff` / `#1a1a1a`. |
+| F-7 | Low | Diagrams | Implementer visual-check path was text-only. | Implementer → Browser added in §2.6. |
+| F-8 | Low | Open decisions | Req Q-4 (later multi-page) was not listed. | OD-6: this release is one static page. |
+
+Low items F-7 and F-8 are documentation-only and do not block approval.
