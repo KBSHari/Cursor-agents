@@ -1,0 +1,74 @@
+{
+  "name": "getJiraIssue",
+  "description": "Get a Jira or JSM issue by key or ID. Use for one known issue; use searchJiraIssuesUsingJql to find or list many issues. Reports how many comments an issue has, not the comments themselves — for those use listJiraIssueComments. View \"evidence\" also returns the issue's links to other issues.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "cloudId": {
+        "type": "string",
+        "description": "Site UUID or Jira/Confluence URL for this operation's Atlassian site. cloudId is never silently auto-resolved or reused for you — call getAccessibleAtlassianResources ONCE per session, cache the returned cloudId, and pass it explicitly on this and every subsequent call, since most operations need it. `execute` and its read/write/destructive variants strictly require it for cloudId-scoped operations and fail without it. Not needed for cloudId-less operations (e.g. Bitbucket), which ignore this field."
+      },
+      "issueIdOrKey": {
+        "type": "string",
+        "description": "Issue key (PROJ-123), numeric ID, or a Jira issue URL"
+      },
+      "fields": {
+        "type": "array",
+        "items": {},
+        "description": "Custom Jira field IDs to fetch (e.g. [\"customfield_10010\", \"customfield_10020\"]). Overrides the view's fetch strategy. For custom fields in normal use, prefer view: \"evidence\", which fetches and maps them automatically. Use [\"*all\"] to fetch every field (expensive — prefer view: \"full\" instead).\n"
+      },
+      "includeEditableFields": {
+        "type": "boolean",
+        "description": "When true, also return compact metadata for fields the authenticated user can edit on this issue, including type, allowed values, and operations. Omit unless preparing an edit: this makes an extra Jira REST call.\n"
+      },
+      "fieldsByKeys": {
+        "type": "boolean",
+        "description": "When true, each entry in `fields` is interpreted as a Jira field key (e.g. \"summary\", \"description\") instead of a field id. Matches the Jira REST `fieldsByKeys` query parameter. Ignored when `fields` is omitted (default field list uses ids).\n"
+      },
+      "expand": {
+        "type": "string",
+        "description": "Additional Jira expand tokens (comma-separated), e.g. \"renderedFields,changelog\". Merged with any expand the server adds for custom-field mapping (e.g. \"names\"); duplicate tokens removed. Note \"changelog\" here returns only the newest page, sorted newest-first, and it accepts startAt/maxResults then ignores them — so it cannot be paged and reports a longer history as complete. Use listJiraIssueChangelogs to read all of it (oldest-first); do not mix their orderings.\n"
+      },
+      "properties": {
+        "type": "array",
+        "items": {},
+        "description": "Issue entity property keys to return (Jira `properties` query param, repeated per key). Omit unless you rely on app-specific issue properties.\n"
+      },
+      "failFast": {
+        "type": "boolean",
+        "description": "When true, forwards Jira's `failFast` query flag for this GET. Omit for Jira default behavior.\n"
+      },
+      "responseContentFormat": {
+        "type": "string",
+        "enum": [
+          "markdown",
+          "html"
+        ],
+        "description": "Format for rich-text bodies — description and environment, plus any comment bodies the view returns. Defaults to markdown. Set html to receive HTML, which is lossless, so you can pass it straight back to editJiraIssue/addOrEditJiraIssueComment with contentFormat: html. Bodies holding anything markdown cannot represent — inline media, panels, expands, layouts, statuses, @mentions, dates, emoji — are returned as HTML automatically, because markdown would drop those nodes or turn them into literal text on write-back. An explicit markdown request is overridden for those bodies, with a warning saying so; appliedContentFormat in the response reports the format you actually got.\n"
+      },
+      "actionSource": {
+        "type": "string",
+        "enum": [
+          "jira_mcp_card",
+          "model_tool_call"
+        ],
+        "description": "Optional invocation attribution. Jira MCP cards set jira_mcp_card; omit for model/tool-loop calls."
+      },
+      "view": {
+        "type": "string",
+        "enum": [
+          "compact",
+          "evidence",
+          "full"
+        ],
+        "description": "Output view preset. Default: \"compact\". Options: \"compact\", \"evidence\", \"full\". compact = minimal fields for scanning; evidence = decision-relevant detail; full = complete response."
+      }
+    },
+    "required": [
+      "cloudId",
+      "issueIdOrKey"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

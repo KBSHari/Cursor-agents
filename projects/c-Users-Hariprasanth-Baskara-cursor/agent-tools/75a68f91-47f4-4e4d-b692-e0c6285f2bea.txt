@@ -1,0 +1,308 @@
+MCP headers config ignored when server has OAuth discovery - Bug Reports - Cursor - Community Forum
+
+# MCP headers config ignored when server has OAuth discovery 
+
+ rsb March 27, 2026, 4:11pm 1 
+
+### Where does the bug appear (feature/product)?
+
+Cursor IDE
+
+### Describe the Bug
+
+When an MCP server has OAuth discovery endpoints (RFC 9728), Cursor ignores the headers configuration and always attempts OAuth authentication. This occurs in both plugin `mcp.json` and global `mcp.json` configurations.
+
+### Steps to Reproduce
+
+1. Configure an MCP server with headers (in either plugin or global `mcp.json`):
+
+```auto
+{
+  "mcpServers": {
+    "my-server": {
+      "url": "https://example.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${env:MY_API_KEY}",
+        "Content-Type": "application/json"
+      }
+    }
+  }
+}
+
+```
+
+2. The server at example.com has OAuth discovery at `/.well-known/oauth-authorization-server`
+3. Toggle the MCP server on in Cursor
+4. Observe: Cursor requests `/.well-known/oauth-authorization-server` and attempts OAuth - it never sends the configured `Authorization` header
+
+### Expected Behavior
+
+When `headers` is configured in `mcp.json` (plugin or global), Cursor should use those headers for MCP requests instead of attempting OAuth discovery.
+
+Actual (buggy) behavior: Cursor:
+
+1. Checks OAuth discovery endpoints first
+2. If OAuth discovery returns 200/302, uses OAuth flow
+3. Never uses the configured headers
+4. The `Authorization header` is never sent to `/mcp/`
+
+### Operating System
+
+Linux
+
+### Version Information
+
+Version: 2.6.21 VSCode Version: 1.105.1 Commit: fea2f546c979a0a4ad1deab23552a43568807590 Date: 2026-03-21T22:09:10.098Z Build Type: Stable Release Track: Default Electron: 39.8.1 Chromium: 142.0.7444.265 Node.js: 22.22.1 V8: 14.2.231.22-electron.0 OS: Linux x64 6.8.0-106-generic
+
+### For AI issues: which model did you use?
+
+### For AI issues: add Request ID with privacy disabled
+
+### Additional Information
+
+Evidence from Server Logs: Only OAuth discovery requests received - no POST requests with Authorization header:
+
+```auto
+GET /.well-known/oauth-authorization-server → 302
+GET /.well-known/oauth-protected-resource/mcp → 200
+
+```
+
+No POST `/mcp/` requests with Authorization: Bearer … header appear in logs.
+
+Impact:
+
+This breaks API key authentication for servers that also support OAuth. Users cannot use headers config when their server has OAuth endpoints. For the moment, we’re going to try a workaround on the MCP server side and create an alternative endpoint, `/api/mcp` that’ll return a 404 for OAuth discovery, which will hopefully force Cursor to use the configured `headers` .
+
+This compounds with the Remote SSH OAuth token sync issue that we filed earlier (see MCP OAuth Token Not Used After Successful Authentication ) – Remote SSH users cannot use OAuth (tokens don’t sync to remote host), and now cannot use headers either.
+
+### Does this stop you from using Cursor
+
+No - Cursor works, but with this issue
+
+ deanrie (Dean Rie) March 27, 2026, 8:03pm 5 
+
+Hey, great bug report, it’s super clear.
+
+This is a confirmed bug. When the MCP server responds to the OAuth discovery endpoints, Cursor starts the OAuth flow before it sends the POST with your `Authorization` header. There’s no logic like “if `Authorization` is already in the headers, skip OAuth.” We’ve seen the same root cause in a similar report: Remote MCP with expired bearer token triggers misleading OAuth error
+
+The team is aware of the issue. There’s no ETA yet, but your report helps with prioritization, especially since it expands the scope to valid headers plus OAuth discovery, not just an expired token.
+
+Your workaround with an alternate `/api/mcp` endpoint that returns 404 for OAuth discovery is the most reliable option right now.
+
+Let me know if the workaround doesn’t work, or if anything changes.
+
+ rsb March 27, 2026, 8:40pm 7 
+
+Hi Dean, glad to hear that you found the report useful. We got the `/api/mcp` endpoint to work with the `Authorization` header, but not before uncovering another bug related to overly aggressive OAuth probing which deviates from the OAuth RFC. Here’s that bug: *** Cursor MCP client probes OAuth even when server signals OAuth unavailable***
+
+Have a nice weekend!
+
+ Ayaz_Khan (Ayaz Khan) April 10, 2026, 4:15am 8 
+
+I am going to +1 this issue. Ever since upgrading to v3, our header-auth-based MCP server no longer connects with Cursor. We have tried several workarounds, but it looks like the OP has correctly identified the bug in this case.
+
+@deanrie You mentioned no ETA, but please, prioritize this.
+
+ chris-NR7 (Chris) April 10, 2026, 8:08am 9 
+
+### Where does the bug appear (feature/product)?
+
+### Describe the Bug
+
+I successfully setup a github MCP server to provide access to the github ‘projects’ tools (30 days ago) and it was working correctly. I returned to working on this project a few days ago and find I now get an error in cursor settings:
+
+```auto
+2026-04-10 09:01:40.742 [info] [V2] Handling CreateClient action
+2026-04-10 09:01:40.742 [info] [V2 FSM] connection:connect_start: conn=idle,auth=unknown -> conn=connecting,auth=unknown
+2026-04-10 09:01:42.203 [info] No stored client information found
+2026-04-10 09:01:42.206 [info] Using redirect URL
+2026-04-10 09:01:42.207 [warning] Transient error connecting to streamableHttp server: Incompatible auth server: does not support dynamic client registration
+2026-04-10 09:01:42.207 [warning] Connection failed: Incompatible auth server: does not support dynamic client registration
+2026-04-10 09:01:42.207 [warning] [V2 FSM] connection:connect_failure: conn=connecting,auth=unknown -> conn=failed,auth=unknown
+2026-04-10 09:01:42.207 [info] CreateClient completed, connected: false, statusType: error
+
+```
+
+### Steps to Reproduce
+
+Create an MCP entry with a github personal access token as follows:
+
+```auto
+    "github-projects": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/x/projects",
+      "headers": {
+        "Authorization": "Bearer ghp_my_key”
+      }
+    },
+
+```
+
+### Expected Behavior
+
+Cursoe should authenticate with the github MCP server should provide the github projects tools.
+
+### Operating System
+
+```auto
+Version: 3.0.13
+VSCode Version: 1.105.1
+Commit: 48a15759f53cd5fc9b5c20936ad7d79847d914b0
+Date: 2026-04-07T03:05:17.114Z
+Layout: editor
+Build Type: Stable
+Release Track: Default
+Electron: 39.8.1
+Chromium: 142.0.7444.265
+Node.js: 22.22.1
+V8: 14.2.231.22-electron.0
+OS: Darwin x64 24.6.0
+
+```
+
+I think this may be a similar issue:
+
+> Where does the bug appear (feature/product)? Cursor IDE Describe the Bug The official Slack MCP plugin (https://mcp.slack.com/mcp) fails to authenticate. Cursor’s OAuth client attempts Dynamic Client Registration (DCR), but Slack’s auth server doesn’t support DCR, causing a fatal error on both streamableHttp and SSE transports. No “Connect” button or browser OAuth prompt ever appears. Steps to Reproduce Install the Slack MCP plugin from the Cursor marketplace Go to Settings > MCP — the slack … 
+
+### Does this stop you from using Cursor
+
+No - Cursor works, but with this issue
+
+ deanrie (Dean Rie) April 15, 2026, 12:49pm 10 
+
+@Ayaz_Khan - I passed this along to the team. The regression after upgrading to v3 is a useful signal for prioritization. Unfortunately, there’s no client-side workaround right now. The logic to skip OAuth when the `Authorization` header is present is simply missing.
+
+@chris-NR7 - this is the same bug. I already replied in your separate thread here: Regression: github projects endpoint no longer accessible - #5 by deanrie
+
+If anything changes or a fix ships, we’ll update here.
+
+ Dan_Walker (Dan Walker) May 5, 2026, 11:46am 14 
+
++1 We first saw this on 15/4, sadly still no fix as of latest Cursor update 
+
+Edit : I reauthorised my access key and the tool started working again!
+
+ deanrie (Dean Rie) May 5, 2026, 4:18pm 15 
+
+Hey, thanks for checking in, Dan. Update on the thread: the ticket that was linked to this report ended up getting closed without a fix, and there’s no replacement yet, so it makes sense there haven’t been any changes in recent updates.
+
+Since the issue still reproduces on 3.x, I’ll refile it with the team separately, with an up-to-date scope valid `headers` plus a server with OAuth discovery, not just an expired token.
+
+To make this as useful as possible, can anyone share:
+
+- your Cursor version Help → About and your OS
+- a sanitized snippet of `mcp.json` for the affected server
+- what the server logs show when MCP is enabled do you only see `GET /.well-known/...` and no `POST /mcp/`
+- whether the OP workaround helps using an alternative endpoint that returns 404 for OAuth discovery
+
+I’ll post back here once there’s an update on a fix.
+
+cc @rsb @Ayaz_Khan @chris-NR7
+
+ chris-NR7 (Chris) May 21, 2026, 4:01pm 16 
+
+```auto
+Version: 3.5.17
+VSCode Version: 1.105.1
+Commit: d5b2fc092e16007956c9e5047f76097b9e626ca0
+Date: 2026-05-20T02:43:31.559Z
+Layout: editor
+Build Type: Stable
+Release Track: Default
+Electron: 39.8.1
+Chromium: 142.0.7444.265
+Node.js: 22.22.1
+V8: 14.2.231.22-electron.0
+OS: Darwin x64 24.6.0
+
+```
+
+Sanitized mcp.json
+
+```json
+{
+  "mcpServers": {
+    "dart": {
+      "command": "dart mcp-server",
+      "env": {},
+      "args": []
+    },
+    "github": {
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "secret"
+      }
+    },
+    "github-projects": {
+      "type": "http",
+      "url": "https://scorpio.local/mcp/x/projects"
+    }
+  }
+}
+
+```
+
+I have developed a workaround using a local proxy (caddyserver). I don’t seem to be able to upload these files, so here are the Caddyfile and the log.
+
+```xml
+scorpio.local:443 {
+	# 1) Force Cursor to *not* go down OAuth discovery paths
+	@oauth_discovery path /.well-known/oauth-protected-resource* /.well-known/oauth-authorization-server* /.well-known/openid-configuration*
+	respond @oauth_discovery 404
+	# 2) MCP → GitHub Copilot (e.g. /mcp/x/projects)
+	@mcp path /mcp*
+	handle @mcp {
+		reverse_proxy https://api.githubcopilot.com {
+			header_up Host api.githubcopilot.com
+			header_up Authorization "Bearer {env.GITHUB_TOKEN}"
+			header_up -Cookie
+		}
+	}
+	# Everything else → Gitea (container port 3000)
+	handle {
+		reverse_proxy http://gitea:3000
+	}
+        # enable logging
+        log
+}
+
+```
+
+```log
+caddy     | {"level":"info","ts":1778318150.7047343,"msg":"using provided configuration","config_file":"/etc/caddy/Caddyfile","config_adapter":"caddyfile"}
+caddy     | {"level":"warn","ts":1778318150.7073557,"msg":"Caddyfile input is not formatted; run 'caddy fmt --overwrite' to fix inconsistencies","adapter":"caddyfile","file":"/etc/caddy/Caddyfile","line":18}
+caddy     | {"level":"info","ts":1778318150.7091126,"logger":"admin","msg":"admin endpoint started","address":"localhost:2019","enforce_origin":false,"origins":["//[::1]:2019","//127.0.0.1:2019","//localhost:2019"]}
+caddy     | {"level":"info","ts":1778318150.7092972,"logger":"http.auto_https","msg":"server is listening only on the HTTPS port but has no TLS connection policies; adding one to enable TLS","server_name":"srv0","https_port":443}
+caddy     | {"level":"info","ts":1778318150.709315,"logger":"http.auto_https","msg":"enabling automatic HTTP->HTTPS redirects","server_name":"srv0"}
+caddy     | {"level":"info","ts":1778318150.7095013,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0xc000403c80"}
+caddy     | {"level":"warn","ts":1778318150.732525,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:/data/caddy","instance":"722a5a56-e952-4ffa-be31-4b6c7a1b9c94","try_again":1778404550.7325215,"try_again_in":86399.999999498}
+caddy     | {"level":"info","ts":1778318150.7327597,"logger":"tls","msg":"finished cleaning storage units"}
+caddy     | {"level":"warn","ts":1778318150.783829,"logger":"pki.ca.local","msg":"installing root certificate (you might be prompted for password)","path":"storage:pki/authorities/local/root.crt"}
+caddy     | {"level":"info","ts":1778318150.7864442,"msg":"define JAVA_HOME environment variable to use the Java trust"}
+caddy     | {"level":"info","ts":1778318150.7864711,"msg":"warning: \"certutil\" is not available, install \"certutil\" with \"apt install libnss3-tools\" or \"yum install nss-tools\" and try again"}
+caddy     | {"level":"info","ts":1778318150.9262078,"msg":"certificate installed properly in linux trusts"}
+caddy     | {"level":"info","ts":1778318150.9266312,"logger":"http","msg":"enabling HTTP/3 listener","addr":":443"}
+caddy     | {"level":"info","ts":1778318150.9267867,"msg":"failed to sufficiently increase receive buffer size (was: 208 kiB, wanted: 2048 kiB, got: 416 kiB). See https://github.com/quic-go/quic-go/wiki/UDP-Buffer-Sizes for details."}
+caddy     | {"level":"info","ts":1778318150.926927,"logger":"http.log","msg":"server running","name":"srv0","protocols":["h1","h2","h3"]}
+caddy     | {"level":"info","ts":1778318150.9271307,"logger":"http.log","msg":"server running","name":"remaining_auto_https_redirects","protocols":["h1","h2","h3"]}
+caddy     | {"level":"info","ts":1778318150.927166,"logger":"http","msg":"enabling automatic TLS certificate management","domains":["scorpio.local"]}
+caddy     | {"level":"warn","ts":1778318150.9292018,"logger":"tls","msg":"stapling OCSP","error":"no OCSP stapling for [scorpio.local]: no OCSP server specified in certificate","identifiers":["scorpio.local"]}
+caddy     | {"level":"info","ts":1778318150.93016,"msg":"autosaved config (load with --resume flag)","file":"/config/caddy/autosave.json"}
+caddy     | {"level":"info","ts":1778318150.9301805,"msg":"serving initial configuration"}
+caddy     | {"level":"error","ts":1778318158.4809556,"logger":"http.log.access","msg":"handled request","request":{"remote_ip":"192.168.0.31","remote_port":"56737","client_ip":"192.168.0.31","proto":"HTTP/1.1","method":"GET","host":"scorpio.local","uri":"/.well-known/oauth-protected-resource/mcp/x/projects","headers":{"Accept":["*/*"],"Accept-Language":["*"],"Sec-Fetch-Mode":["cors"],"User-Agent":["node"],"Accept-Encoding":["br, gzip, deflate"],"Connection":["keep-alive"],"Mcp-Protocol-Version":["2025-11-25"]},"tls":{"resumed":false,"version":772,"cipher_suite":4867,"proto":"http/1.1","server_name":"scorpio.local"}},"bytes_read":0,"user_id":"","duration":0.038566186,"size":0,"status":404,"resp_headers":{"Cache-Control":["max-age=0, private, must-revalidate, no-transform"],"Set-Cookie":[],"X-Frame-Options":["SAMEORIGIN"],"Date":["Sat, 09 May 2026 09:15:58 GMT"],"Content-Length":["0"],"Server":["Caddy"],"Alt-Svc":["h3=\":443\"; ma=2592000"]}}
+caddy     | {"level":"error","ts":1778318158.5282135,"logger":"http.log.access","msg":"handled request","request":{"remote_ip":"192.168.0.31","remote_port":"56738","client_ip":"192.168.0.31","proto":"HTTP/1.1","method":"GET","host":"scorpio.local","uri":"/.well-known/oauth-protected-resource","headers":{"Accept":["*/*"],"Accept-Language":["*"],"Sec-Fetch-Mode":["cors"],"User-Agent":["node"],"Accept-Encoding":["br, gzip, deflate"],"Connection":["keep-alive"],"Mcp-Protocol-Version":["2025-11-25"]},"tls":{"resumed":true,"version":772,"cipher_suite":4867,"proto":"http/1.1","server_name":"scorpio.local"}},"bytes_read":0,"user_id":"","duration":0.001792681,"size":0,"status":404,"resp_headers":{"Server":["Caddy"],"Alt-Svc":["h3=\":443\"; ma=2592000"],"Set-Cookie":[],"X-Frame-Options":["SAMEORIGIN"],"Date":["Sat, 09 May 2026 09:15:58 GMT"],"Content-Length":["0"],"Cache-Control":["max-age=0, private, must-revalidate, no-transform"]}}
+caddy     | {"level":"info","ts":1778318159.6098228,"logger":"http.log.access","msg":"handled request","request":{"remote_ip":"192.168.0.31","remote_port":"56737","client_ip":"192.168.0.31","proto":"HTTP/1.1","method":"POST","host":"scorpio.local","uri":"/mcp/x/projects","headers":{"Connection":["keep-alive"],"User-Agent":["Cursor/3.2.16 (darwin x64)"],"Sec-Fetch-Mode":["cors"],"Accept-Encoding":["br, gzip, deflate"],"Content-Length":["46"],"Mcp-Session-Id":["b27c018d-f474-4d3a-ad42-5d5e30d9d256"],"Mcp-Protocol-Version":["2025-11-25"],"Content-Type":["application/json"],"Accept":["application/json, text/event-stream"],"Accept-Language":["*"]},"tls":{"resumed":false,"version":772,"cipher_suite":4867,"proto":"http/1.1","server_name":"scorpio.local"}},"bytes_read":46,"user_id":"","duration":0.558956879,"size":8941,"status":200,"resp_headers":{"Alt-Svc":["h3=\":443\"; ma=2592000"],"Access-Control-Allow-Methods":["GET, POST, DELETE, OPTIONS"],"Access-Control-Expose-Headers":["Mcp-Session-Id, WWW-Authenticate"],"X-Github-Request-Id":["A43C:3A5D0A:81B411:9C8176:69FEFB4F"],"Cache-Control":["no-cache, no-transform"],"Access-Control-Allow-Headers":["Content-Type, Mcp-Session-Id, Mcp-Protocol-Version, Last-Event-ID, Authorization, X-MCP-Readonly, X-MCP-Toolsets, X-MCP-Tools, X-MCP-Exclude-Tools, X-MCP-Features, X-MCP-Lockdown, X-MCP-Insiders"],"Content-Type":["text/event-stream"],"X-Github-Backend":["Kubernetes"],"Access-Control-Allow-Origin":["*"],"Date":["Sat, 09 May 2026 09:15:59 GMT"],"Access-Control-Max-Age":["86400"],"Strict-Transport-Security":["max-age=31536000"],"Server":["Caddy","github.com"],"Content-Security-Policy":["default-src 'none'; sandbox"]}}
+caddy     | {"level":"error","ts":1778318160.3721316,"logger":"http.log.access","msg":"handled request","request":{"remote_ip":"192.168.0.31","remote_port":"56742","client_ip":"192.168.0.31","proto":"HTTP/1.1","method":"GET","host":"scorpio.local","uri":"/.well-known/oauth-protected-resource/mcp/x/projects","headers":{"Connection":["keep-alive"],"Mcp-Protocol-Version":["2025-11-25"],"Accept":["*/*"],"Accept-Language":["*"],"Sec-Fetch-Mode":["cors"],"User-Agent":["node"],"Accept-Encoding":["br, gzip, deflate"]},"tls":{"resumed":false,"version":772,"cipher_suite":4867,"proto":"http/1.1","server_name":"scorpio.local"}},"bytes_read":0,"user_id":"","duration":0.008092557,"size":0,"status":404,"resp_headers":{"Date":["Sat, 09 May 2026 09:16:00 GMT"],"Server":["Caddy"],"Alt-Svc":["h3=\":443\"; ma=2592000"],"Content-Length":["0"],"Cache-Control":["max-age=0, private, must-revalidate, no-transform"],"Set-Cookie":[],"X-Frame-Options":["SAMEORIGIN"]}}
+caddy     | {"level":"error","ts":1778318160.4325926,"logger":"http.log.access","msg":"handled request","request":{"remote_ip":"192.168.0.31","remote_port":"56744","client_ip":"192.168.0.31","proto":"HTTP/1.1","method":"GET","host":"scorpio.local","uri":"/.well-known/oauth-protected-resource","headers":{"Sec-Fetch-Mode":["cors"],"User-Agent":["node"],"Accept-Encoding":["br, gzip, deflate"],"Connection":["keep-alive"],"Mcp-Protocol-Version":["2025-11-25"],"Accept":["*/*"],"Accept-Language":["*"]},"tls":{"resumed":true,"version":772,"cipher_suite":4867,"proto":"http/1.1","server_name":"scorpio.local"}},"bytes_read":0,"user_id":"","duration":0.001370516,"size":0,"status":404,"resp_headers":{"Alt-Svc":["h3=\":443\"; ma=2592000"],"Cache-Control":["max-age=0, private, must-revalidate, no-transform"],"Set-Cookie":[],"X-Frame-Options":["SAMEORIGIN"],"Date":["Sat, 09 May 2026 09:16:00 GMT"],"Content-Length":["0"],"Server":["Caddy"]}}
+caddy     | {"level":"info","ts":1778318161.2721767,"logger":"http.log.access","msg":"handled request","request":{"remote_ip":"192.168.0.31","remote_port":"56744","client_ip":"192.168.0.31","proto":"HTTP/1.1","method":"POST","host":"scorpio.local","uri":"/mcp/x/projects","headers":{"Sec-Fetch-Mode":["cors"],"Content-Length":["46"],"Mcp-Protocol-Version":["2025-11-25"],"Accept":["application/json, text/event-stream"],"Content-Type":["application/json"],"Accept-Language":["*"],"Accept-Encoding":["br, gzip, deflate"],"Connection":["keep-alive"],"Mcp-Session-Id":["3c36344d-7fd1-4d1e-b383-900cbdce7ace"],"User-Agent":["Cursor/3.2.16 (darwin x64)"]},"tls":{"resumed":true,"version":772,"cipher_suite":4867,"proto":"http/1.1","server_name":"scorpio.local"}},"bytes_read":46,"user_id":"","duration":0.263495658,"size":8941,"status":200,"resp_headers":{"Content-Type":["text/event-stream"],"Strict-Transport-Security":["max-age=31536000"],"Access-Control-Max-Age":["86400"],"Access-Control-Allow-Headers":["Content-Type, Mcp-Session-Id, Mcp-Protocol-Version, Last-Event-ID, Authorization, X-MCP-Readonly, X-MCP-Toolsets, X-MCP-Tools, X-MCP-Exclude-Tools, X-MCP-Features, X-MCP-Lockdown, X-MCP-Insiders"],"Content-Security-Policy":["default-src 'none'; sandbox"],"X-Github-Backend":["Kubernetes"],"Server":["Caddy","github.com"],"Access-Control-Expose-Headers":["Mcp-Session-Id, WWW-Authenticate"],"Date":["Sat, 09 May 2026 09:16:01 GMT"],"Access-Control-Allow-Origin":["*"],"X-Github-Request-Id":["A43C:3A5D0A:81B7F8:9C8644:69FEFB4F"],"Access-Control-Allow-Methods":["GET, POST, DELETE, OPTIONS"],"Cache-Control":["no-cache, no-transform"],"Alt-Svc":["h3=\":443\"; ma=2592000"]}}
+caddy     | {"level":"info","ts":1778318161.2722375,"logger":"http.log.access","msg":"handled request","request":{"remote_ip":"192.168.0.31","remote_port":"56742","client_ip":"192.168.0.31","proto":"HTTP/1.1","method":"POST","host":"scorpio.local","uri":"/mcp/x/projects","headers":{"Connection":["keep-alive"],"Mcp-Session-Id":["3c36344d-7fd1-4d1e-b383-900cbdce7ace"],"Content-Length":["46"],"Mcp-Protocol-Version":["2025-11-25"],"User-Agent":["Cursor/3.2.16 (darwin x64)"],"Content-Type":["application/json"],"Accept":["application/json, text/event-stream"],"Accept-Language":["*"],"Sec-Fetch-Mode":["cors"],"Accept-Encoding":["br, gzip, deflate"]},"tls":{"resumed":false,"version":772,"cipher_suite":4867,"proto":"http/1.1","server_name":"scorpio.local"}},"bytes_read":46,"user_id":"","duration":0.26356027,"size":8941,"status":200,"resp_headers":{"Cache-Control":["no-cache, no-transform"],"X-Github-Request-Id":["A43C:3A5D0A:81B7F8:9C8645:69FEFB51"],"Server":["Caddy","github.com"],"Access-Control-Max-Age":["86400"],"Alt-Svc":["h3=\":443\"; ma=2592000"],"Access-Control-Expose-Headers":["Mcp-Session-Id, WWW-Authenticate"],"X-Github-Backend":["Kubernetes"],"Strict-Transport-Security":["max-age=31536000"],"Access-Control-Allow-Headers":["Content-Type, Mcp-Session-Id, Mcp-Protocol-Version, Last-Event-ID, Authorization, X-MCP-Readonly, X-MCP-Toolsets, X-MCP-Tools, X-MCP-Exclude-Tools, X-MCP-Features, X-MCP-Lockdown, X-MCP-Insiders"],"Content-Security-Policy":["default-src 'none'; sandbox"],"Date":["Sat, 09 May 2026 09:16:01 GMT"],"Access-Control-Allow-Methods":["GET, POST, DELETE, OPTIONS"],"Content-Type":["text/event-stream"],"Access-Control-Allow-Origin":["*"]}}
+caddy     | {"level":"info","ts":1778318161.9682016,"logger":"http.log.access","msg":"handled request","request":{"remote_ip":"192.168.0.31","remote_port":"56742","client_ip":"192.168.0.31","proto":"HTTP/1.1","method":"POST","host":"scorpio.local","uri":"/mcp/x/projects","headers":{"Mcp-Session-Id":["3c36344d-7fd1-4d1e-b383-900cbdce7ace"],"Mcp-Protocol-Version":["2025-11-25"],"Sec-Fetch-Mode":["cors"],"Accept-Encoding":["br, gzip, deflate"],"Connection":["keep-alive"],"Accept":["application/json, text/event-stream"],"Accept-Language":["*"],"Content-Length":["46"],"User-Agent":["Cursor/3.2.16 (darwin x64)"],"Content-Type":["application/json"]},"tls":{"resumed":false,"version":772,"cipher_suite":4867,"proto":"http/1.1","server_name":"scorpio.local"}},"bytes_read":46,"user_id":"","duration":0.165552232,"size":8941,"status":200,"resp_headers":{"Access-Control-Allow-Methods":["GET, POST, DELETE, OPTIONS"],"X-Github-Request-Id":["A43C:3A5D0A:81B9DD:9C88AF:69FEFB51"],"Alt-Svc":["h3=\":443\"; ma=2592000"],"Access-Control-Expose-Headers":["Mcp-Session-Id, WWW-Authenticate"],"Content-Type":["text/event-stream"],"Access-Control-Allow-Origin":["*"],"Strict-Transport-Security":["max-age=31536000"],"Access-Control-Max-Age":["86400"],"Date":["Sat, 09 May 2026 09:16:01 GMT"],"Server":["Caddy","github.com"],"X-Github-Backend":["Kubernetes"],"Cache-Control":["no-cache, no-transform"],"Content-Security-Policy":["default-src 'none'; sandbox"],"Access-Control-Allow-Headers":["Content-Type, Mcp-Session-Id, Mcp-Protocol-Version, Last-Event-ID, Authorization, X-MCP-Readonly, X-MCP-Toolsets, X-MCP-Tools, X-MCP-Exclude-Tools, X-MCP-Features, X-MCP-Lockdown, X-MCP-Insiders"]}}
+
+```
+
+ deanrie (Dean Rie) May 22, 2026, 4:50am 18 
+
+Hey, thanks for the details and for the full Caddyfile. That’s exactly what we need. The Caddy config that returns 404 on `/.well-known/oauth-*` is a neat general-purpose workaround that should work for anyone hitting this bug.
+
+Confirmed: on 3.5.17 the bug is still reproducible in the same way. The OAuth discovery probes still win over the static `Authorization` header. We now have enough info for a refile, so I’ll open a fresh issue with the updated scope, valid `headers` plus a server with OAuth discovery, not just the expired-token case, and I’ll link this thread. If there’s any update on a fix, I’ll post back here.

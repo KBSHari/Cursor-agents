@@ -1,0 +1,47 @@
+{
+  "name": "addGraphContext",
+  "description": "Adds a relationship between two entities in the Teamwork Graph (e.g. linking two Jira work items, marking one as blocking another, attaching a remote link, or connecting a Jira work item to an Atlas project or goal).",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "cloudId": {
+        "type": "string",
+        "description": "Site UUID or Jira/Confluence URL for this operation's Atlassian site. cloudId is never silently auto-resolved or reused for you — call getAccessibleAtlassianResources ONCE per session, cache the returned cloudId, and pass it explicitly on this and every subsequent call, since most operations need it. `execute` and its read/write/destructive variants strictly require it for cloudId-scoped operations and fail without it. Not needed for cloudId-less operations (e.g. Bitbucket), which ignore this field."
+      },
+      "relationshipType": {
+        "type": "string",
+        "enum": [
+          "jira-work-item-links-jira-work-item",
+          "jira-work-item-blocks-jira-work-item",
+          "jira-work-item-links-jira-work-item-remote-link",
+          "jira-work-item-tracks-atlassian-project",
+          "jira-work-item-contributes-to-atlassian-goal"
+        ],
+        "description": "Type of relationship to create. Determines which entity types 'objectIdentifier' and 'targetObjectIdentifier' must resolve to."
+      },
+      "objectIdentifier": {
+        "type": "string",
+        "maxLength": 500,
+        "description": "Identifier of the source entity. Accepts an ARI, a full URL, or a stable key (e.g. ENG-123 for a Jira work item). Format depends on relationshipType."
+      },
+      "targetObjectIdentifier": {
+        "type": "string",
+        "maxLength": 500,
+        "description": "Identifier of the target entity. Accepts an ARI, a full URL, or a stable key (e.g. ATLAS-20426 for an Atlas project). Format depends on relationshipType."
+      },
+      "title": {
+        "type": "string",
+        "maxLength": 500,
+        "description": "Optional display label for the target. Used by relationships that surface a title (e.g. remote links); ignored otherwise."
+      }
+    },
+    "required": [
+      "cloudId",
+      "relationshipType",
+      "objectIdentifier",
+      "targetObjectIdentifier"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

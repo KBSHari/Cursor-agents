@@ -1,0 +1,35 @@
+{
+  "name": "update_issue_comment",
+  "description": "Update the body of an existing issue or pull request conversation comment. This tool cannot update pull request review comments.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "body": {
+        "type": "string",
+        "description": "New comment content",
+        "minLength": 1
+      },
+      "comment_id": {
+        "type": "integer",
+        "description": "The numeric ID of the issue or pull request conversation comment to update. Do not use a pull request review comment ID.",
+        "minimum": 1
+      },
+      "owner": {
+        "type": "string",
+        "description": "Repository owner",
+        "x-mcp-header": "owner"
+      },
+      "repo": {
+        "type": "string",
+        "description": "Repository name",
+        "x-mcp-header": "repo"
+      }
+    },
+    "required": [
+      "owner",
+      "repo",
+      "comment_id",
+      "body"
+    ]
+  }
+}

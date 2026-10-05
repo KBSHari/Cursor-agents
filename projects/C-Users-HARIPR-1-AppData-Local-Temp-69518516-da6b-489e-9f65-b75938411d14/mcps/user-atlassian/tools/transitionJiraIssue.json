@@ -1,0 +1,68 @@
+{
+  "name": "transitionJiraIssue",
+  "description": "Move a Jira issue through its workflow and/or into a sprint or the backlog — at least one is required. Take transitionId from listJiraIssueTransitions; transitionName is the transition's own name, not the target status. Returns the status the issue actually landed in, so no read-back is needed. If the sprint/backlog move fails after the status change succeeds, the status change stays — retry the move alone, not the whole call.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "cloudId": {
+        "type": "string",
+        "description": "Site UUID or Jira/Confluence URL for this operation's Atlassian site. cloudId is never silently auto-resolved or reused for you — call getAccessibleAtlassianResources ONCE per session, cache the returned cloudId, and pass it explicitly on this and every subsequent call, since most operations need it. `execute` and its read/write/destructive variants strictly require it for cloudId-scoped operations and fail without it. Not needed for cloudId-less operations (e.g. Bitbucket), which ignore this field."
+      },
+      "issueIdOrKey": {
+        "type": "string",
+        "description": "Issue key like PROJ-123"
+      },
+      "transitionId": {
+        "type": "string",
+        "description": "Transition ID (get from listJiraIssueTransitions). Provide either transitionId or transitionName."
+      },
+      "transitionName": {
+        "type": "string",
+        "description": "Name of the transition itself, not the target status — the two often differ, so \"Done\" does not match a transition named \"Review->Done\". Provide either transitionId or transitionName."
+      },
+      "fields": {
+        "type": "object",
+        "additionalProperties": {},
+        "description": "Optional Jira field values to apply during the workflow transition."
+      },
+      "update": {
+        "type": "object",
+        "additionalProperties": {},
+        "description": "Optional Jira field update operations to apply during the workflow transition. A comment passed here may be dropped without error — the transition reports success and no comment is created. Use addOrEditJiraIssueComment instead."
+      },
+      "historyMetadata": {
+        "type": "object",
+        "additionalProperties": {},
+        "description": "Optional issue history metadata to attach to the workflow transition."
+      },
+      "sprintId": {
+        "type": "integer",
+        "minimum": 1,
+        "description": "Assign the issue into this sprint. Mutually exclusive with assignToBacklog."
+      },
+      "assignToBacklog": {
+        "type": "boolean",
+        "description": "Set true to assign the issue to the backlog, mutually exclusive with sprintId. Optionally use boardId to target a specific board's backlog."
+      },
+      "boardId": {
+        "type": "integer",
+        "minimum": 1,
+        "description": "Only used when assignToBacklog is true: targets this specific board's backlog (board IDs from listJiraBoards). Ignored otherwise."
+      },
+      "actionSource": {
+        "type": "string",
+        "enum": [
+          "jira_mcp_card",
+          "model_tool_call"
+        ],
+        "description": "Optional invocation attribution. Jira MCP cards set jira_mcp_card; omit for model/tool-loop calls."
+      }
+    },
+    "required": [
+      "cloudId",
+      "issueIdOrKey"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

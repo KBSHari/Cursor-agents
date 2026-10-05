@@ -1,0 +1,52 @@
+{
+  "name": "create_or_update_file",
+  "description": "Create or update a single file in a GitHub repository. \nIf updating, you should provide the SHA of the file you want to update. Use this tool to create or update a file in a GitHub repository remotely; do not use it for local file operations.\n\nTo obtain the current blob SHA before updating, call the get_file_contents tool with the same owner, repo, and path, and set its ref parameter to this tool's branch value. The first text result reports the blob SHA for the requested path.\n\nSHA MUST be provided for existing file updates.\n",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "allow_symlink_write": {
+        "type": "boolean",
+        "description": "Set true to update a symbolic link itself; content must be its new target path.",
+        "default": false
+      },
+      "branch": {
+        "type": "string",
+        "description": "Branch to create/update the file in"
+      },
+      "content": {
+        "type": "string",
+        "description": "Content of the file, exactly as it should appear once written. Do not base64-encode it; this server does that before calling the REST API."
+      },
+      "message": {
+        "type": "string",
+        "description": "Commit message"
+      },
+      "owner": {
+        "type": "string",
+        "description": "Repository owner (username or organization)",
+        "x-mcp-header": "owner"
+      },
+      "path": {
+        "type": "string",
+        "description": "Path where to create/update the file"
+      },
+      "repo": {
+        "type": "string",
+        "description": "Repository name",
+        "x-mcp-header": "repo"
+      },
+      "sha": {
+        "type": "string",
+        "description": "The blob SHA of the file being replaced. Required if the file already exists. Retrieve it with get_file_contents using the same owner, repo, and path, with ref set to this tool's branch value."
+      }
+    },
+    "required": [
+      "owner",
+      "repo",
+      "path",
+      "content",
+      "message",
+      "branch"
+    ]
+  }
+}

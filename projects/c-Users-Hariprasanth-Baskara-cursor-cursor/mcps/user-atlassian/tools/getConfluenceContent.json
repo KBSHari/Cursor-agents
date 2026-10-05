@@ -1,0 +1,54 @@
+{
+  "name": "getConfluenceContent",
+  "description": "REQUIRED: Supply at least one content locator: content_id or content_url.\nRead any Confluence content (page, blog, live doc, comment, whiteboard, embed, database, folder).\n",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "cloudId": {
+        "type": "string",
+        "description": "Site UUID or Jira/Confluence URL for this operation's Atlassian site. cloudId is never silently auto-resolved or reused for you — call getAccessibleAtlassianResources ONCE per session, cache the returned cloudId, and pass it explicitly on this and every subsequent call, since most operations need it. `execute` and its read/write/destructive variants strictly require it for cloudId-scoped operations and fail without it. Not needed for cloudId-less operations (e.g. Bitbucket), which ignore this field."
+      },
+      "content_id": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Required when content_url is omitted. Numeric Confluence content ID, or a\nConfluence tiny link key (the encoded part\nfrom /wiki/x/ URLs, e.g. 4_sXAQ). Recognized Confluence content URLs are also\naccepted and converted to the content ID, but prefer content_url for URLs.\nOne of content_id or content_url is required.\n"
+      },
+      "content_url": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Required when content_id is omitted. Full URL of the Confluence content.\nSupported: pages/live docs\n(/pages/{id}), blog URLs (/blog/{id}), whiteboards\n(/whiteboard/{id}), databases (/database/{id}), folders (/folder/{id}),\nand TinyUrl (/wiki/x/{key}). Prefer this for URLs copied from Confluence.\nOne of content_id or content_url is required.\n"
+      },
+      "detail": {
+        "type": "string",
+        "enum": [
+          "summary",
+          "ai_summary",
+          "outline",
+          "full"
+        ],
+        "description": "Response shape for document-style reads. summary = title + excerpt + counts\n(default, cheap). ai_summary = the generated AI summary when available, otherwise\nnull; it does not fall back to the standard excerpt. outline = heading tree (cheap,\nfor navigation). full = body in the requested format (use when intending to edit).\nNon-document content such as whiteboards, databases, folders, and embeds does not support detail;\ncontent_format is a separate representation selector for\nformats such as whiteboard svg/png, database csv, or embed url.\n"
+      },
+      "content_format": {
+        "type": "string",
+        "enum": [
+          "html",
+          "markdown",
+          "url",
+          "svg",
+          "png",
+          "csv"
+        ],
+        "description": "Body format. Doc types: html (default) or markdown. Document HTML can contain\nsupported macro wrappers instead of content displayed in Confluence web. When\nvisible macro content is required, use resolveConfluenceContentMacros with the\nreturned numeric content ID and all=true; use discover if its full contract is\nneeded. Whiteboards: svg or png (png is read-only and returns a short-lived\npresigned URL to the file in body.value, not the image content). Databases: csv.\nURL-backed content such as embeds: url.\n"
+      },
+      "draft": {
+        "type": "boolean",
+        "description": "If true, read the draft version instead of current. Only supported for\npages and blog posts.\n"
+      }
+    },
+    "required": [
+      "cloudId"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

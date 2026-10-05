@@ -1,0 +1,71 @@
+{
+  "name": "createJiraIssue",
+  "description": "Create a new Jira issue. Custom fields go in additional_fields: keyed by field name, values are resolved automatically, so no field lookup is needed first (user fields take accountIds); keyed by customfield_* ID, pass the value in Jira's format. A rejected create returns a repairHint and names the field at fault where there is one, with its allowedValues when known, so retry from that. If sprint assignment fails, the response still has the new issue's key and sprintAssignment.assigned: false — do not create it again.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "cloudId": {
+        "type": "string",
+        "description": "Site UUID or Jira/Confluence URL for this operation's Atlassian site. cloudId is never silently auto-resolved or reused for you — call getAccessibleAtlassianResources ONCE per session, cache the returned cloudId, and pass it explicitly on this and every subsequent call, since most operations need it. `execute` and its read/write/destructive variants strictly require it for cloudId-scoped operations and fail without it. Not needed for cloudId-less operations (e.g. Bitbucket), which ignore this field."
+      },
+      "projectKey": {
+        "type": "string",
+        "description": "Project key (e.g. PROJ)."
+      },
+      "summary": {
+        "type": "string",
+        "description": "Issue summary / title."
+      },
+      "issueType": {
+        "type": "string",
+        "description": "Issue type name (e.g. Bug, Task, Story, Epic). Use listJiraProjectIssueTypesMetadata to list valid types for this project if unsure.\n"
+      },
+      "description": {
+        "type": "string",
+        "description": "Issue description in markdown, or HTML with contentFormat html. Converted to Jira ADF automatically."
+      },
+      "contentFormat": {
+        "type": "string",
+        "enum": [
+          "markdown",
+          "html"
+        ],
+        "description": "Body format for description. Defaults to markdown; html adds panels, tables and status lozenges. For HTML body shapes, first get the format guide via the generic operation runner (execute) as name=getContentFormatGuide, inputs={toolName: \"createJiraIssue\"}. Inline media needs an existing issue: create first, then embed with editJiraIssue. When the HTML content-format feature is disabled the call is rejected rather than downgraded, because markdown would store the HTML tags as literal text.\n"
+      },
+      "priority": {
+        "type": "string",
+        "description": "Priority name (e.g. High, Medium, Low, Highest, Lowest)."
+      },
+      "assignee": {
+        "type": "string",
+        "description": "Account ID of the assignee. Resolve a name with listJiraIssueAssignableUsers, which returns only users who can be assigned in this project; lookupJiraAccountId resolves any user and does not check that."
+      },
+      "labels": {
+        "type": "array",
+        "items": {},
+        "description": "List of label strings (e.g. [\"bug\", \"needs-triage\"])."
+      },
+      "parent": {
+        "type": "string",
+        "description": "Parent issue key for sub-tasks or child issues (e.g. PROJ-10)."
+      },
+      "additional_fields": {
+        "type": "object",
+        "additionalProperties": {},
+        "description": "Additional Jira fields. Keys can be human-readable field names or raw customfield_* IDs. Values can be human-readable (resolved automatically) or already-correct Jira shapes. Examples:\n  {\"Story Points\": 8}                          ← number field by name\n  {\"Team\": \"Backend\"}                          ← option/select by name\n  {\"Reviewers\": [\"alice@acme.com\", \"bob@acme.com\"]}  ← multi-user by accountId\n  {\"Component Area\": \"Platform / Auth\"}        ← cascading select as \"Parent / Child\"\n  {\"customfield_10010\": 8}                     ← raw ID (no resolution needed, fastest)\n  {\"components\": [{\"name\": \"Backend\"}]}        ← system array field (raw shape)\n  {\"fixVersions\": [{\"name\": \"v2.0\"}]}          ← system array field (raw shape)\nOn error, the response includes allowedValues and a repairHint for self-correction.\n"
+      },
+      "assignToSprint": {
+        "type": "string",
+        "description": "Optional sprint assignment after the issue is created. Accepts a numeric sprint ID, an exact sprint name, or \"active\" to resolve an active sprint. Numeric sprint IDs assign directly and do not need board lookup. When omitted, createJiraIssue behaves exactly as before and does not make sprint calls.\n"
+      }
+    },
+    "required": [
+      "cloudId",
+      "projectKey",
+      "summary",
+      "issueType"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

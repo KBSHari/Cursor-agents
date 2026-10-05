@@ -1,0 +1,50 @@
+{
+  "name": "search",
+  "description": "Semantically search Jira, Confluence, and connected third-party content using Rovo Search. ALWAYS use this tool to search for Jira and Confluence content unless CQL or JQL is specified. The utilisation of this tool may consume up to 10 Rovo Credits. If the user or organization does not have any Rovo Credits available, the tool call will fail.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "cloudId": {
+        "type": "string",
+        "description": "Site UUID or Jira/Confluence URL for this operation's Atlassian site. cloudId is never silently auto-resolved or reused for you — call getAccessibleAtlassianResources ONCE per session, cache the returned cloudId, and pass it explicitly on this and every subsequent call, since most operations need it. `execute` and its read/write/destructive variants strictly require it for cloudId-scoped operations and fail without it. Not needed for cloudId-less operations (e.g. Bitbucket), which ignore this field."
+      },
+      "query": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1000,
+        "description": "The search query."
+      },
+      "targetApp": {
+        "type": "string",
+        "enum": [
+          "ALL",
+          "JIRA",
+          "CONFLUENCE",
+          "THIRD_PARTY"
+        ],
+        "description": "Filters results by product and is only applicable for standard mode. ALL searches everything. JIRA returns only Jira issues/boards/projects. CONFLUENCE returns only Confluence pages/blogs/spaces. THIRD_PARTY returns content from ready connected external sources."
+      },
+      "mode": {
+        "type": "string",
+        "enum": [
+          "STANDARD",
+          "AGENTIC",
+          "ENHANCED"
+        ],
+        "description": "Search mode. STANDARD returns matching records; AGENTIC asks the search agent to synthesize an answer with full agentic effort; ENHANCED uses a faster agentic loop to return ranked citations."
+      },
+      "limit": {
+        "type": "integer",
+        "minimum": 10,
+        "maximum": 30,
+        "default": 10
+      }
+    },
+    "required": [
+      "cloudId",
+      "query"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

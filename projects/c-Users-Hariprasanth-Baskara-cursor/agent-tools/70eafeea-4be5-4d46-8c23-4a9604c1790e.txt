@@ -1,0 +1,365 @@
+Cursor MCP Servers Setup vs VS Code Agents [2026]
+
+# Cursor MCP Servers vs VS Code Agents: 12 Steps [2026]
+
+- Nadia Dubois
+- September 14, 2026
+- Software
+
+ Nadia Dubois September 14, 2026 21 min read
+
+Cursor’s Model Context Protocol (MCP) integration has quietly become one of the most searched setup topics among developers moving between Visual Studio Code and Cursor in 2026. Searches for “cursor mcp servers” now pull roughly 720 monthly queries in the US, and the reason is simple: MCP lets an AI coding agent reach outside the editor to touch a real database, a Figma file, a GitHub repo, or a Slack channel, instead of just guessing at your codebase. Getting that wiring right, and pairing it with Cursor’s structured rules system, is what separates an AI agent that ships working code from one that hallucinates a plausible-looking mess.
+
+This tutorial walks through configuring MCP servers and project rules files in Cursor step by step, using the current release cycle as of September 14, 2026, and shows where Visual Studio Code’s own Agents feature (shipped in VS Code 1.136 and 1.137) fits into the same workflow. By the end you will have a working MCP setup, a structured rules directory that actually constrains your AI agent, and a clear sense of when to reach for VS Code’s native agent tools instead.
+
+## What MCP Actually Does Inside Cursor
+
+The Model Context Protocol is an open standard, originally published by Anthropic, that defines how an AI agent talks to external tools and data sources. Cursor adopted it as the backbone for connecting its agent to anything outside the local file tree: a Postgres database, a Figma design file, a GitHub issue tracker, a browser automation tool, or an internal company API. Without MCP, Cursor’s agent can only reason about the files open in your workspace. With MCP servers configured, the same agent can query a live database schema before writing a migration, or pull the exact spacing values from a Figma frame before writing CSS.
+
+Cursor exposes MCP configuration in two layers. There is a GUI at Settings → MCP that lists connected servers and lets you toggle them on or off per session, and underneath that GUI sits plain JSON configuration that you can edit directly or check into version control. That dual approach matters for teams: the JSON files are what actually get shared and reviewed, while the GUI is what an individual developer uses day to day to see what is currently active.
+
+It is worth being precise about what an MCP server is not. It is not a plugin that changes Cursor’s UI, and it is not a model. It is a small process, often just a Node.js or Python script, that exposes a defined set of “tools” (functions the agent can call) and “resources” (data the agent can read) over a standard interface. Cursor’s agent decides when to call those tools based on your prompt and the tool descriptions the server publishes. You can read the full protocol specification at the official Model Context Protocol site.
+
+## Prerequisites and Versions
+
+Before starting, confirm you are running current software. Configuration paths and rule file formats have changed enough over the past year that following an outdated guide will leave you editing files Cursor no longer reads.
+
+| Requirement | Minimum Version | Notes |
+| --- | --- | --- |
+| Cursor editor | Latest stable (Sept. 2026 build) | MCP Settings GUI requires a recent build; check Cursor → About |
+| Node.js (for most MCP servers) | 18.x or newer | Many community MCP servers ship as npm packages run via npx |
+| Python (for Python-based MCP servers) | 3.10 or newer | Only needed if you install a Python MCP server |
+| Git | 2.30 or newer | For committing `.cursor/` config to your repo |
+| Visual Studio Code (optional, for comparison) | 1.137.0 (Sept. 9, 2026) | Needed only if you’re also configuring VS Code Agents |
+| Operating system | macOS, Windows, or Linux | Config file paths differ by OS, covered below |
+
+You’ll also want an account on whatever service you plan to connect first. A common starting point is a GitHub MCP server, a filesystem MCP server (built into Cursor’s defaults), or a database MCP server pointed at a local development database, never a production one.
+
+## Step 1: Locate Your Global and Project MCP Config Files
+
+Cursor splits MCP configuration into two scopes, and understanding the difference now will save you a lot of confusion later. The global config applies to every project you open in Cursor. The project-local config applies only to the current workspace and, if you commit it to Git, follows the whole team.
+
+| OS | Global config path | Project-local config path |
+| --- | --- | --- |
+| macOS / Linux | `~/.cursor/mcp.json` | `.cursor/mcp.json` at repo root |
+| Windows | `%USERPROFILE%\.cursor\mcp.json` | `.cursor\mcp.json` at repo root |
+
+If neither file exists yet, create the project-local one first. That keeps your MCP servers scoped to the repo you’re actually working in, which matters if you juggle client work or multiple codebases with different tool access requirements.
+
+```
+mkdir -p .cursor
+touch .cursor/mcp.json
+echo '.cursor/mcp.json' >> .gitignore   # skip this line if you WANT it shared with your team
+```
+
+A quick decision point: if your MCP servers reference personal API keys, keep the file out of Git and use environment variable references instead (covered in Step 4). If your MCP servers reference shared, non-secret tools like an internal linter or a read-only staging database, commit the file so every teammate gets the same agent capabilities on clone.
+
+## Step 2: Add Your First MCP Server Through the Settings GUI
+
+Open Cursor and go to Settings → MCP. This is the fastest way to add a server without hand-writing JSON, and it’s the recommended starting point if you’ve never configured MCP before.
+
+- Click “Add new MCP server”
+- Give it a short, lowercase name with no spaces (for example, `filesystem` or `github`)
+- Choose the transport type: `stdio` for a local process, or `http`/`sse` for a remote hosted server
+- Paste the command Cursor should run to start the server (for npm-distributed servers, this is usually an `npx` command)
+- Save, then check the green/red status dot next to the server name to confirm it started successfully
+
+The GUI writes directly to the JSON files described in Step 1, so anything you configure here is fully editable by hand afterward. That two-way sync is intentional: it lets a solo developer click through the GUI while a team lead reviews the resulting JSON in a pull request.
+
+## Step 3: Write the MCP JSON Configuration by Hand
+
+For anything beyond a single test server, editing the JSON directly is faster and easier to review in a diff. Here is a minimal but realistic `.cursor/mcp.json` connecting a filesystem server and a GitHub server:
+
+```
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "./src"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    }
+  }
+}
+```
+
+Each key under `mcpServers` is a server name that will appear in Cursor’s agent tool list. The `command` and `args` fields tell Cursor how to launch the process; the `env` block passes environment variables into that process, which is where credentials belong instead of hardcoded strings. Full field documentation lives in Cursor’s official MCP docs.
+
+Restart Cursor, or use the reload button in Settings → MCP, and confirm both servers show a green status. If a server fails to start, the status dot turns red and hovering over it shows the stderr output from the launched process, which is almost always the fastest way to diagnose a bad command or missing dependency.
+
+## Step 4: Keep Secrets Out of Committed Config With Environment Variables
+
+Never paste a raw API token into `.cursor/mcp.json` if that file is going into version control. Use the `${VARIABLE_NAME}` syntax shown above, and set the actual value in your shell profile or a local `.env` file that stays untracked.
+
+```
+# in ~/.zshrc or ~/.bashrc, NOT in the repo
+export GITHUB_TOKEN="ghp_your_token_here"
+export POSTGRES_MCP_URL="postgresql://readonly_user:pw@localhost:5432/dev_db"
+```
+
+This is the single most common security mistake teams make when adopting MCP quickly: committing a working config that happens to include a live token because it was faster than setting up environment variables during a demo. Treat every MCP credential the same way you’d treat a database password in a `.env` file, because functionally that’s what it is.
+
+## Step 5: Scope Which Tools the Agent Can Actually Call
+
+Some MCP servers expose dozens of tools, and not all of them are safe to let an autonomous agent call without review. A database server might expose both `read_query` and `execute_query`; you almost certainly want the agent running `read_query` freely while `execute_query` stays behind a manual approval step. Cursor’s agent settings let you require confirmation before any tool call that isn’t explicitly marked auto-run, and it is worth leaving that confirmation step on for anything that writes, deletes, or sends data outside your machine.
+
+A practical rule: start every new MCP server with confirmation required on all its tools. Only flip a specific tool to auto-run once you’ve watched the agent use it correctly several times in low-stakes situations. This is slower on day one and considerably safer on day thirty.
+
+## Step 6: Build a Structured Rules Directory
+
+MCP gives the agent access to tools; rules govern how it behaves once it has them. Cursor’s current rules system lives in `.cursor/rules/`, a directory of markdown files with the `.mdc` extension. Each file carries YAML frontmatter that controls when it applies, and Cursor injects the matching rules directly into the agent’s system prompt before every response. Full documentation is available in Cursor’s rules reference.
+
+```
+mkdir -p .cursor/rules
+touch .cursor/rules/backend.mdc
+touch .cursor/rules/testing.mdc
+```
+
+Splitting rules by concern, rather than writing one giant file, is what makes the modern format worth adopting over the legacy single-file approach. A backend rule file only needs to load when the agent is touching backend code; a testing rule file should apply everywhere tests live. That scoping is handled by the `globs` field described in the next step.
+
+## Step 7: Write a Rule File With Frontmatter
+
+Here’s a working example for a backend-focused rule file that only applies inside a specific directory:
+
+```
+---
+description: Backend API coding standards
+globs: ["src/backend/**/*.py"]
+alwaysApply: false
+---
+
+When writing or editing files in src/backend/, follow these rules:
+
+- Use type hints on every function signature.
+- Never write a raw SQL string with string interpolation; use the
+  query builder in src/backend/db/query.py instead.
+- All new endpoints must have a corresponding test in tests/backend/
+  before the change is considered complete.
+- Prefer explicit exceptions over silent None returns on error paths.
+```
+
+The three frontmatter fields do distinct jobs. `description` is a human-readable summary shown in Cursor’s UI. `globs` is a list of file patterns; the rule only activates when the agent is working on a file matching one of those patterns. `alwaysApply`, when set to `true`, forces the rule into every request regardless of which files are open, which is appropriate for something like a project-wide “always write commit messages in imperative mood” rule but overkill for anything file-specific.
+
+Keep individual rule files short. A rule file that reads like a full engineering handbook gets partially ignored, because long instructions competing with your actual prompt for the model’s attention tend to lose. Five to fifteen concrete, checkable instructions per file works better than one sprawling document.
+
+## Step 8: Add an agents.md for Cross-Editor Consistency
+
+If your team uses more than one AI coding tool, and most teams in 2026 do, a single project-root `agents.md` file has become the closest thing to a shared standard. Cursor, GitHub Copilot, Claude Code, and Cline all read it as a fallback rule source, which means one file can set baseline expectations regardless of which editor a given teammate prefers.
+
+```
+# AGENTS.md
+
+## Project context
+This is a Django + React monorepo. Backend lives in /backend,
+frontend in /frontend. Tests are required for all backend PRs.
+
+## Conventions
+- Python: black formatting, type hints required
+- React: functional components only, no class components
+- Commit messages: conventional commits (feat:, fix:, chore:)
+
+## Do not
+- Modify anything in /legacy without explicit approval
+- Add new npm dependencies without checking with the team first
+```
+
+Treat `agents.md` as the lowest common denominator across tools and `.cursor/rules/` as the Cursor-specific depth layer on top of it. That combination avoids duplicating the same instructions in five different config formats every time your team adds a new AI tool.
+
+## Step 9: Migrate an Existing .cursorrules File
+
+If your project still has a single legacy `.cursorrules` file at the repo root, it still works, Cursor kept backward compatibility for it, but new projects should move to the structured directory format. Migration is mostly a matter of splitting the file by topic and adding frontmatter to each piece.
+
+1. Open your existing `.cursorrules` file and read through it once, grouping the instructions mentally by topic (testing, style, architecture, security).
+2. Create one `.mdc` file per topic in `.cursor/rules/`.
+3. Add appropriate `globs` to each new file so it only loads for relevant files.
+4. Delete the instructions from `.cursorrules` once they’re confirmed working in the new files, or delete the file entirely once everything has moved.
+5. Commit the change with a clear message so teammates notice the new structure.
+
+Do this migration incrementally rather than in one sitting. Move one topic, test that the agent is actually respecting it on a few real tasks, then move the next. A rules migration that silently drops an important constraint is much harder to notice than a build that fails outright.
+
+## Step 10: Test That Rules and MCP Tools Are Actually Being Used
+
+Configuration that silently fails to load is worse than no configuration, because it gives false confidence. Verify both systems are active before trusting them on real work.
+
+For rules: open the Cursor chat panel, look for the rules indicator (usually a small icon showing how many rule files are currently active), and confirm the count matches what you expect for the file you’re editing. Then ask the agent a question that would only be answered correctly if it followed a specific rule, for example “what SQL access pattern should I use here,” and check the answer references your query builder rule instead of suggesting raw string interpolation.
+
+For MCP: ask the agent to do something that requires a tool call, like “list the open issues in this repo” if you’ve configured the GitHub server. Watch for the tool-call confirmation prompt (if you left confirmations on per Step 5) and check that the returned data is real, not a plausible-sounding guess. If the agent answers from general knowledge instead of calling the tool, the server likely isn’t connected the way you think it is.
+
+## Step 11: Compare Against VS Code’s Native Agents Feature
+
+Visual Studio Code has been closing the gap on agentic workflows through its own release cycle, and it’s worth knowing where it currently stands so you can pick the right tool for a given task rather than assuming Cursor is always the deeper option. VS Code 1.136, released September 2, 2026, focused on finishing pull requests with agents and managing agent work across complex, multi-repo workspaces. VS Code 1.137, released a week later on September 9, 2026, added an Agents window for reviewing GitHub issues and pull requests, plus the ability to automate recurring work and continue quick chats across sessions.
+
+| Capability | Cursor | VS Code 1.137 |
+| --- | --- | --- |
+| External tool access | MCP servers, GUI + JSON config | Native GitHub Copilot tool integration, expanding MCP support |
+| Project-wide behavior rules | Structured `.cursor/rules/*.mdc` with glob scoping | Workspace instructions files, less granular scoping |
+| Cross-repo agent management | Projects view (chats, agents, files in one place) | Agents window for managing PRs and issues across repos |
+| Mobile / remote access | iOS app for paid plans to launch cloud agents | No dedicated mobile app for agent management |
+| Rule file portability | Reads `agents.md` as cross-tool fallback | Reads `agents.md` where supported by the active extension |
+
+The practical takeaway: if your workflow centers on reviewing and finishing pull requests across a large organization’s repos, VS Code’s Agents window is purpose-built for that. If your workflow centers on deep, file-scoped control over how an AI agent writes new code inside a single project, Cursor’s rules and MCP combination currently offers finer-grained control. Many teams in 2026 run both, using VS Code for PR triage and Cursor for active feature development, rather than treating the choice as exclusive. Full release notes are available directly from Microsoft for VS Code 1.137 and VS Code 1.136, and the complete version history is on the official VS Code GitHub releases page.
+
+## Step 12: Set Up a Second MCP Server for a Real Workflow
+
+One server is a proof of concept; two working together is where MCP starts paying off. A common pairing is a filesystem or code-search server alongside a project-management server, so the agent can both read your code and check a linked ticket before writing anything.
+
+```
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "./src"]
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "${POSTGRES_MCP_URL}"]
+    },
+    "figma": {
+      "command": "npx",
+      "args": ["-y", "figma-mcp-server"],
+      "env": { "FIGMA_TOKEN": "${FIGMA_TOKEN}" }
+    }
+  }
+}
+```
+
+Point the Postgres server at a local development database only. If you need the agent to reason about production schema, export a schema-only dump and let it read that instead of granting any tool direct production access. The convenience of a connected agent is not worth the risk of an autonomous tool call touching a live database.
+
+## Common Pitfalls When Configuring Cursor MCP and Rules
+
+These mistakes come up repeatedly enough to call out specifically before you hit them yourself.
+
+- Committing secrets in mcp.json. Hardcoded tokens in a committed config file end up in your Git history permanently, even if you remove them in a later commit. Use environment variable references from the start.
+- Writing one giant rules file instead of scoped ones. A single 300-line rule file with no `globs` scoping gets loaded for every request regardless of relevance, which both wastes context and dilutes the instructions that actually matter for the current file.
+- Forgetting to restart Cursor after editing mcp.json by hand. Manual edits to the JSON file don’t always hot-reload; use the reload button in Settings → MCP or restart the editor to be sure.
+- Leaving destructive tools on auto-run. A database server’s `execute_query` tool or a filesystem server’s delete capability should require confirmation until you’ve built real trust in how the agent uses them.
+- Mixing legacy .cursorrules with new .cursor/rules/ files that contradict each other. Both are read simultaneously during a migration; conflicting instructions in each produce inconsistent agent behavior that’s hard to debug.
+- Pointing an MCP database server at production. Even a read-only credential on a production database is a bigger blast radius than most teams intend to give an AI agent by default.
+- Assuming agents.md alone is enough. It’s a useful cross-tool baseline, but it doesn’t get the file-scoped precision of `.cursor/rules/*.mdc`, so relying on it exclusively in Cursor leaves capability on the table.
+
+## Troubleshooting Cursor MCP and Rules Configuration
+
+Work through these in order when something isn’t behaving as expected.
+
+- MCP server shows a red status dot. Hover over it to see the stderr output. Most commonly this is a missing dependency (Node or Python not installed, or the wrong version) or a malformed `command`/`args` pair in the JSON.
+- Agent never calls the tool even though the server is green. Check the tool’s description in the server’s source; vague or generic tool descriptions make it harder for the model to know when to use them. Try a more explicit prompt naming the tool or action directly.
+- JSON file edits aren’t taking effect. Confirm you’re editing the correct scope (global vs. project-local); a project-local file always takes precedence for that workspace, so an edit to the global file may appear to do nothing.
+- Environment variable isn’t resolving inside mcp.json. Confirm the variable is exported in the same shell environment Cursor was launched from; launching Cursor from a desktop icon rather than a terminal sometimes misses shell profile exports on macOS.
+- Rule file isn’t applying to the expected files. Double-check the `globs` pattern; a pattern like `src/*.py` only matches files directly in `src/`, not subdirectories, while `src/**/*.py` matches recursively.
+- Rules indicator shows zero active rules. Confirm the `.mdc` files actually have valid YAML frontmatter between two `---` lines; a missing closing `---` breaks parsing silently.
+- Two conflicting rule files produce inconsistent output. Search for other `.mdc` files or a leftover `.cursorrules` with overlapping globs, and consolidate them.
+- MCP server works locally but breaks for teammates after a pull. This usually means the config references a local absolute path or an environment variable that isn’t documented anywhere; add setup notes to your README covering required environment variables.
+- npx-based server is slow to start every session. Install the package globally or pin a specific version instead of letting `npx` resolve and download it fresh each time Cursor launches.
+
+## Advanced Tips for Production Teams
+
+Once the basics are working, a few refinements make the setup noticeably more reliable at scale. First, version your `.cursor/rules/` directory the same way you’d version any other source of truth about how code should be written, with a changelog comment at the top of files that change often. Second, if your team maintains more than three or four rule files, add an index rule with `alwaysApply: true` that briefly summarizes what the other files cover, since the agent benefits from knowing the map even when a specific file’s `globs` hasn’t matched yet.
+
+Third, for MCP servers your team shares, document required environment variables in your repo’s README under a “Cursor Setup” heading, not just in the JSON comments (JSON doesn’t support comments, which is itself a reason to keep a parallel markdown explanation). Fourth, periodically audit which MCP tools are set to auto-run; a tool that seemed safe to automate three months ago may have grown new capabilities after a server update. Finally, if you’re running both Cursor and VS Code across a team, standardize on a shared `agents.md` first and treat editor-specific configuration (`.cursor/rules/` or VS Code workspace instructions) as an enhancement layer on top, not a replacement.
+
+## Complete Working Project: A Realistic Setup
+
+Here is a full, working configuration for a typical Django and React project, combining everything covered above into one reference you can copy and adapt.
+
+```
+your-project/
+├── AGENTS.md
+├── .cursor/
+│   ├── mcp.json
+│   └── rules/
+│       ├── index.mdc
+│       ├── backend.mdc
+│       ├── frontend.mdc
+│       └── testing.mdc
+├── backend/
+└── frontend/
+```
+
+```
+// .cursor/mcp.json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."]
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "${POSTGRES_MCP_URL}"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}" }
+    }
+  }
+}
+```
+
+```
+---
+# .cursor/rules/index.mdc
+description: Project overview and rule map
+alwaysApply: true
+---
+
+This is a Django (backend/) + React (frontend/) project.
+See backend.mdc for API conventions, frontend.mdc for React
+conventions, and testing.mdc for test requirements. Always
+check AGENTS.md for cross-tool baseline conventions first.
+```
+
+With this structure in place, cloning the repo, exporting the three required environment variables, and opening it in Cursor gives every teammate the same MCP tool access and the same rule-governed agent behavior, without anyone needing to manually reconstruct the setup from memory or a wiki page that’s gone stale.
+
+## When to Use MCP Versus Just VS Code Copilot Agents
+
+Not every task needs the full MCP setup described in this tutorial. If you’re working solo on a small script and just want inline completions and occasional chat help, either editor’s default AI features handle that without any extra configuration. MCP and structured rules earn their setup cost specifically when: multiple people share a codebase and need consistent AI behavior, the agent needs to touch systems outside the local file tree (databases, design tools, issue trackers), or the project has hard constraints (security rules, architectural boundaries) that you cannot afford the agent to violate even occasionally.
+
+For lighter, PR-focused agent work across many repositories, VS Code’s Agents window, expanded in the 1.136 and 1.137 releases, is often less setup for equivalent value. Reserve the fuller Cursor MCP and rules configuration for projects where the payoff, consistent, tool-connected, constraint-respecting AI assistance, is worth the initial time investment described in the steps above.
+
+## How MCP and Rules Affect Agent Cost and Response Time
+
+Every active MCP server and every matched rule file adds tokens to the context Cursor sends the model on each request, and that has a direct effect on both latency and API cost if you’re on a usage-based plan. A rule file with `alwaysApply: true` gets included in literally every single message, so a bloated always-on rule file is a recurring cost, not a one-time one. The same is true of MCP tool descriptions: a server that exposes thirty tools, each with a paragraph-long description, adds meaningful overhead to every request the agent makes, whether or not it ends up calling any of those tools.
+
+In practice this means it’s worth periodically pruning both systems rather than treating them as write-once configuration. Disconnect MCP servers you configured for a one-off task and never used again. Consolidate `alwaysApply` rules down to the handful of instructions that genuinely need to be present on every request, and let everything else live behind a `globs` pattern that only loads when relevant. Teams that skip this maintenance tend to notice Cursor’s agent responses getting slower and more expensive over several months without an obvious single cause, when the real culprit is accumulated always-on context from rules and tools nobody remembered to remove.
+
+There’s also a quality dimension, not just a cost one. Models perform better when the context they’re given is relevant to the task at hand. A request cluttered with three unrelated MCP tool schemas and two rule files that don’t apply to the current file is measurably noisier than a clean, well-scoped context, and noisier context tends to produce less reliable agent behavior. Scoping rules tightly with `globs` and keeping the MCP server list focused on what a given project actually needs isn’t just good hygiene, it’s a real lever on how well the agent performs.
+
+## A Worked Example: Diagnosing a Failed MCP Connection
+
+Walking through one realistic failure end to end makes the troubleshooting steps above easier to apply when you hit your own version of the same problem. Say you’ve just added a Postgres MCP server following Step 12, restarted Cursor, and the status dot next to `postgres` in Settings → MCP is showing red.
+
+1. Hover over the red status dot. The tooltip shows a connection refused error pointing at `localhost:5432`.
+2. Confirm the local Postgres instance is actually running with `pg_isready` or by checking your database container’s status. In this example, the local Docker container running Postgres had stopped after a machine restart.
+3. Start the database container, then click the reload icon in Settings → MCP rather than waiting for an automatic retry.
+4. The status dot turns green, but a second check is worth doing: open a new agent chat and ask “what tables exist in the connected database” to confirm the tool call actually returns real schema data rather than the agent guessing.
+5. If the tool call returns an authentication error instead of a connection error, the fix is different: check that `POSTGRES_MCP_URL` is exported in the same shell session Cursor was launched from, since a stale or missing environment variable produces exactly this symptom.
+
+This same sequence, check the status dot’s tooltip first, verify the underlying service independently of Cursor, reload rather than assuming auto-recovery, then confirm with a real tool call, applies to almost any MCP server failure regardless of which service it’s connecting to. The specific error message in the tooltip is almost always enough to point at the right layer, whether that’s the server process itself, the network path, or the credentials being passed through the `env` block.
+
+## Frequently Asked Questions
+
+Does Cursor still support the old .cursorrules file? Yes. Cursor keeps `.cursorrules` working for backward compatibility, but new projects should use the structured `.cursor/rules/*.mdc` directory format, since it supports per-file scoping that the single legacy file cannot.
+
+Is MCP exclusive to Cursor? No. The Model Context Protocol is an open standard maintained independently, and it’s supported by multiple AI coding tools beyond Cursor. Cursor’s implementation, with its Settings → MCP GUI and dual global/project JSON files, is what this tutorial covers specifically.
+
+Can I use MCP servers in VS Code too? VS Code’s tool ecosystem has been expanding MCP support alongside its native GitHub Copilot agent tools, but the configuration approach and available integrations differ from Cursor’s. Check the current VS Code documentation for the exact state of MCP support in your installed version.
+
+Should mcp.json be committed to Git? It depends on whether it contains secrets. If every value is an environment variable reference (using the `${VARIABLE_NAME}` syntax), committing it lets your whole team share the same tool configuration. If it has hardcoded credentials, keep it out of version control entirely.
+
+How many MCP servers can I run at once? There’s no hard limit enforced by Cursor, but each running server is a separate process consuming memory and, for tool-heavy servers, adding more options for the agent to consider when deciding which tool to call. Start with two or three servers directly relevant to your workflow rather than connecting everything available.
+
+Why isn’t my agent following the rules I wrote? Check that the rule file’s `globs` pattern actually matches the file you’re editing, confirm the YAML frontmatter is well-formed with both opening and closing `---` lines, and keep the rule text itself concise; overly long or vague instructions are more likely to be partially ignored.
+
+Is it safe to let an MCP-connected agent run automatically without confirmation? Only for read-only, low-risk tools. Anything that writes, deletes, or sends data outside your machine, including database writes and external API calls, should require manual confirmation until you’ve thoroughly tested how the agent behaves with that specific tool.
+
+What’s the difference between agents.md and .cursor/rules/? `agents.md` is a cross-tool baseline file read by multiple AI coding editors as a fallback, useful for teams mixing Cursor, Copilot, and Claude Code. `.cursor/rules/*.mdc` is Cursor-specific and supports finer-grained, file-scoped rules that only apply to matching files, giving you more precision than a single shared file can.
+
+Nadia Dubois is the AI & Innovation Editor at Tech Insider, where she tracks the rapid evolution of artificial intelligence, from foundation models to real-world enterprise deployment. She previously covered AI and startups for La Tribune and contributed to MIT Technology Review's European coverage. Nadia specializes in generative AI, AI regulation, and the intersection of technology and European industrial policy. She holds a dual degree in Computational Linguistics and Journalism from Sciences Po Paris.
+
+ [email protected]

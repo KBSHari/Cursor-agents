@@ -1,0 +1,100 @@
+{
+  "name": "getGraphContext",
+  "description": "Retrieves connected context from Teamwork Graph for any Atlassian entity. Returns all relationships and linked objects within one traversal – including cross-product and third-party connections. Use when the answer requires connections between entities, not just a single entity's fields.\n\nSupported entry points:\n\nJira: issues, projects, sprints, versions, comments\n\nConfluence: pages, blogposts, whiteboards, databases, spaces\n\nGoals, Projects, Focus Areas, Tags and updates\n\nPeople: users, teams, organisations\n\nDevOps: PRs, repos, deployments, services, builds, designs\n\nLoom: videos, meetings\n\nCompass: components\n\nAssets: objects\n\nIncidents, conversations, calendar events, external documents\n\nAfter calling this tool, call getGraphObject on returned ARIs to get full content.\n\nThe utilisation of this tool may consume up to 10 Rovo Credits. If the user or organization does not have any Rovo Credits available, the tool call will fail.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "cloudId": {
+        "type": "string",
+        "description": "Site UUID or Jira/Confluence URL for this operation's Atlassian site. cloudId is never silently auto-resolved or reused for you — call getAccessibleAtlassianResources ONCE per session, cache the returned cloudId, and pass it explicitly on this and every subsequent call, since most operations need it. `execute` and its read/write/destructive variants strictly require it for cloudId-scoped operations and fail without it. Not needed for cloudId-less operations (e.g. Bitbucket), which ignore this field."
+      },
+      "objectType": {
+        "type": "string",
+        "enum": [
+          "AtlassianGoal",
+          "AtlassianGoalUpdate",
+          "AtlassianHomeComment",
+          "AtlassianHomeTag",
+          "AtlassianProject",
+          "AtlassianProjectUpdate",
+          "AtlassianTeam",
+          "AtlassianUser",
+          "CompassComponent",
+          "ConfluenceBlogPost",
+          "ConfluenceComment",
+          "ConfluenceDatabase",
+          "ConfluencePage",
+          "ConfluenceSpace",
+          "ConfluenceWhiteboard",
+          "ExternalCalendarEvent",
+          "ExternalConversation",
+          "ExternalDeployment",
+          "ExternalDesign",
+          "ExternalDocument",
+          "ExternalOrganisation",
+          "ExternalPosition",
+          "ExternalPullRequest",
+          "ExternalRepository",
+          "ExternalService",
+          "FocusFocusArea",
+          "JiraSpace",
+          "JiraSprint",
+          "JiraVersion",
+          "JiraWorkItem",
+          "JiraWorkItemComment",
+          "AssetsObject",
+          "LoomMeeting",
+          "LoomMeetingRecurrence",
+          "LoomVideo"
+        ],
+        "description": "Type of object to fetch context for."
+      },
+      "objectIdentifier": {
+        "type": "string",
+        "maxLength": 500,
+        "description": "Identifier for the object. It could be a key (e.g. ENG-1234), ID, ARI, or full URL; format depends on objectType."
+      },
+      "detailLevel": {
+        "type": "string",
+        "enum": [
+          "summary",
+          "full"
+        ],
+        "description": "'summary' (counts/metadata) or 'full' (detailed content).",
+        "default": "summary"
+      },
+      "relationshipTypes": {
+        "type": "array",
+        "items": {},
+        "description": "Filter full results to specific relationship types to save tokens (e.g. 'jira-work-item-links-external-build' for Jira work items)."
+      },
+      "targetObjectTypes": {
+        "type": "array",
+        "items": {},
+        "description": "Filter results to only include relationships targeting specific object types (e.g. AtlassianUser, ConfluenceComment)."
+      },
+      "timeRange": {
+        "type": "object",
+        "additionalProperties": {},
+        "description": "Optional time range to filter relationships by creation or update time."
+      },
+      "first": {
+        "type": "integer",
+        "maximum": 50,
+        "description": "Max number of related items to return.",
+        "default": 50
+      },
+      "after": {
+        "type": "string",
+        "description": "Pagination cursor for fetching the next page of results."
+      }
+    },
+    "required": [
+      "cloudId",
+      "objectType",
+      "objectIdentifier"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

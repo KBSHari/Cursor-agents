@@ -1,0 +1,75 @@
+{
+  "name": "addOrEditJiraIssueComment",
+  "description": "Add a comment to a Jira issue, or edit an existing comment. Omit commentId to add a new comment; provide commentId to edit that comment. Comment text (commentBody) supports markdown. To edit, first get the commentId from listJiraIssueComments. Returns the commentId needed to edit or delete it later, plus — unless inline media was embedded — the stored body and appliedContentFormat, the format it was written in.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "cloudId": {
+        "type": "string",
+        "description": "Site UUID or Jira/Confluence URL for this operation's Atlassian site. cloudId is never silently auto-resolved or reused for you — call getAccessibleAtlassianResources ONCE per session, cache the returned cloudId, and pass it explicitly on this and every subsequent call, since most operations need it. `execute` and its read/write/destructive variants strictly require it for cloudId-scoped operations and fail without it. Not needed for cloudId-less operations (e.g. Bitbucket), which ignore this field."
+      },
+      "issueIdOrKey": {
+        "type": "string",
+        "description": "Issue key (e.g. PROJ-123) or a Jira issue URL"
+      },
+      "commentBody": {
+        "type": "string",
+        "description": "Comment text. Markdown by default; set contentFormat: html to pass HTML instead. Required unless adding a new comment purely to embed a file via inlineFileId. Editing replaces the whole comment body: pass the full intended text (fetch the current comment first to preserve it), or \"\" for media only. Editing a body that already contains inline media must use contentFormat: html — markdown drops it. For HTML body shapes (inline media, panels, tables), first get the format guide via the generic operation runner (execute) as name=getContentFormatGuide, inputs={toolName: \"addOrEditJiraIssueComment\"}.\n"
+      },
+      "contentFormat": {
+        "type": "string",
+        "enum": [
+          "markdown",
+          "html"
+        ],
+        "description": "Body format for commentBody. Defaults to markdown. html preserves inline media across a read-modify-write; a body fetched as HTML can be written straight back (Jira resolves media collection/filename server-side and omits them on read — not data loss). Requires the HTML content-format feature; when it is disabled the call is rejected rather than downgraded, because markdown would store the HTML tags as literal text and drop the media.\n"
+      },
+      "commentVisibility": {
+        "type": "object",
+        "additionalProperties": {},
+        "description": "Restrict comment visibility to a Jira group or role. Shape: `{\"type\":\"group\"|\"role\",\"value\":\"<name>\"}`.\nRole and group names are site-specific, so do not reuse a name from another site.\nOn JSM this does not make a comment internal — a restricted comment stays customer-visible\n(`jsdPublic: true`). Use `jsmCommentType: \"internalNote\"` for that.\n"
+      },
+      "jsmCommentType": {
+        "type": "string",
+        "enum": [
+          "internalNote",
+          "publicComment"
+        ],
+        "description": "JSM comment type. Use internalNote for an internal note or publicComment for a customer-visible comment. Applies when adding or editing a JSM comment. Omit for existing Jira behavior.\n"
+      },
+      "commentId": {
+        "type": "string",
+        "description": "ID of an existing comment to edit. When omitted, a new comment is added."
+      },
+      "inlineFileId": {
+        "type": "array",
+        "items": {},
+        "description": "Media file ID(s) from uploadAttachmentToJiraIssue to append inline to the comment, e.g. [\"id1\",\"id2\"]. Requires contentFormat: html and a matching inlineFileCollection (paired by index). Appends at the end; for exact placement, author the media node in the HTML commentBody instead. A file already embedded in the body is rejected (would duplicate).\n"
+      },
+      "inlineFileCollection": {
+        "type": "array",
+        "items": {},
+        "description": "Media collection(s) from the upload step, paired to inlineFileId by index (a single value applies to all). Required whenever inlineFileId is set.\n"
+      },
+      "inlineFileName": {
+        "type": "array",
+        "items": {},
+        "description": "Optional file name(s) (from the upload step's fileName), paired to inlineFileId by index. Only selects the render shape: images render as a block image, other files as an inline chip. Omit to default to the image shape.\n"
+      },
+      "responseContentFormat": {
+        "type": "string",
+        "enum": [
+          "markdown",
+          "html"
+        ],
+        "description": "Format of the echoed comment body. Defaults to the format written, so an html write reads back as html. Bodies markdown cannot represent (media, panels, statuses, @mentions) are always echoed as HTML so a follow-up edit does not destroy them. An explicit markdown request is overridden for those bodies, with a warning saying so; appliedContentFormat in the response reports the format you actually got.\n"
+      }
+    },
+    "required": [
+      "cloudId",
+      "issueIdOrKey"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

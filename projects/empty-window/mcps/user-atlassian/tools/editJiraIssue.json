@@ -1,0 +1,85 @@
+{
+  "name": "editJiraIssue",
+  "description": "Edit an existing Jira issue. Custom fields go in additional_fields: keyed by field name, values are resolved automatically (user fields take accountIds); keyed by customfield_* ID, pass the value in Jira's format. Every field is set, not appended: send the full list for labels, components and other multi-value fields. Change status or move to a sprint with transitionJiraIssue, and convert Task↔Sub-task with convertJiraIssueHierarchy. Empty description or environment with \"\". When editing a body that holds inline media, use contentFormat: html, or the media is dropped. Reorder on a board with rankBeforeIssue or rankAfterIssue; fields are saved first, so a failed reorder leaves the edit applied and returns ranking.ranked: false. The response shows only getJiraIssue's default fields, so other fields you set are not echoed back.\n",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "cloudId": {
+        "type": "string",
+        "description": "Site UUID or Jira/Confluence URL for this operation's Atlassian site. cloudId is never silently auto-resolved or reused for you — call getAccessibleAtlassianResources ONCE per session, cache the returned cloudId, and pass it explicitly on this and every subsequent call, since most operations need it. `execute` and its read/write/destructive variants strictly require it for cloudId-scoped operations and fail without it. Not needed for cloudId-less operations (e.g. Bitbucket), which ignore this field."
+      },
+      "issueIdOrKey": {
+        "type": "string",
+        "description": "Issue key (e.g. PROJ-123)."
+      },
+      "fields": {
+        "type": "object",
+        "additionalProperties": {},
+        "description": "Jira fields payload to set, keyed by field name or customfield_* ID. To clear a field, pass explicit null (e.g. {\"resolution\": null}). Rich-text fields (description/environment) default to markdown; set contentFormat: html to author them in HTML. Editing a body that already contains inline media must use contentFormat: html — markdown drops it. For HTML body shapes (inline media, panels, tables), first get the format guide via the generic operation runner (execute) as name=getContentFormatGuide, inputs={toolName: \"editJiraIssue\"}.\n"
+      },
+      "additional_fields": {
+        "type": "object",
+        "additionalProperties": {},
+        "description": "Additional Jira fields. Keys can be human-readable field names or raw customfield_* IDs. Values can be human-readable (resolved automatically) or already-correct Jira shapes. Examples:\n  {\"Story Points\": 8}                          ← number field by name\n  {\"Team\": \"Backend\"}                          ← option/select by name\n  {\"Reviewers\": [\"alice@acme.com\", \"bob@acme.com\"]}  ← multi-user by accountId\n  {\"Component Area\": \"Platform / Auth\"}        ← cascading select as \"Parent / Child\"\n  {\"customfield_10010\": 8}                     ← raw ID (no resolution needed, fastest)\n  {\"components\": [{\"name\": \"Backend\"}]}        ← system array field (raw shape)\n  {\"fixVersions\": [{\"name\": \"v2.0\"}]}          ← system array field (raw shape)\nOn error, the response includes allowedValues and a repairHint for self-correction.\n"
+      },
+      "inlineFileId": {
+        "type": "array",
+        "items": {},
+        "description": "Media file ID(s) from uploadAttachmentToJiraIssue to append inline to the description, e.g. [\"id1\",\"id2\"]. Requires contentFormat: html and a matching inlineFileCollection (paired by index). Appends at the end, keeping existing content; for exact placement, author the media node in the HTML description instead. A file already embedded in the body is rejected (would duplicate).\n"
+      },
+      "inlineFileCollection": {
+        "type": "array",
+        "items": {},
+        "description": "Media collection(s) from the upload step, paired to inlineFileId by index (a single value applies to all). Required whenever inlineFileId is set.\n"
+      },
+      "inlineFileName": {
+        "type": "array",
+        "items": {},
+        "description": "Optional file name(s) (from the upload step's fileName), paired to inlineFileId by index. Only selects the render shape: images render as a block image, other files as an inline chip. Omit to default to the image shape.\n"
+      },
+      "contentFormat": {
+        "type": "string",
+        "enum": [
+          "markdown",
+          "html"
+        ],
+        "description": "Body format for rich-text fields (description/environment). Defaults to markdown. html preserves inline media across a read-modify-write; a body fetched as HTML can be written straight back (Jira resolves media collection/filename server-side and omits them on read — not data loss). Requires the HTML content-format feature; when it is disabled the call is rejected rather than downgraded, because markdown would store the HTML tags as literal text and drop the media.\n"
+      },
+      "responseContentFormat": {
+        "type": "string",
+        "enum": [
+          "markdown",
+          "html"
+        ],
+        "description": "Output format for rich-text fields in the returned issue. Defaults to markdown. Bodies markdown cannot represent (media, panels, expands, statuses, @mentions) are always returned as HTML, so a follow-up edit does not destroy them. An explicit markdown request is overridden for those bodies, with a warning saying so; appliedContentFormat in the response reports the format you actually got.\n"
+      },
+      "rankBeforeIssue": {
+        "type": "string",
+        "description": "Optional. Rank this issue immediately before the given issue key or ID (LexoRank relative anchor). Mutually exclusive with rankAfterIssue. When omitted, editJiraIssue does not make ranking calls.\n"
+      },
+      "rankAfterIssue": {
+        "type": "string",
+        "description": "Optional. Rank this issue immediately after the given issue key or ID (LexoRank relative anchor). Mutually exclusive with rankBeforeIssue. When omitted, editJiraIssue does not make ranking calls.\n"
+      },
+      "rankCustomFieldId": {
+        "type": "integer",
+        "minimum": 1,
+        "description": "Optional. Numeric Rank field id for this rank call (e.g. 10020). Pass only when the user explicitly provides a Rank field id, or asks to reorder on a specific board's Rank field. For a named board, call getJiraBoardConfig first and use ranking.rankCustomFieldId. Do not invent or guess this id. Omit for ordinary reorders so Jira uses its default Rank field. Ignored unless rankBeforeIssue or rankAfterIssue is also set.\n"
+      },
+      "actionSource": {
+        "type": "string",
+        "enum": [
+          "jira_mcp_card",
+          "model_tool_call"
+        ],
+        "description": "Optional invocation attribution. Jira MCP cards set jira_mcp_card; omit for model/tool-loop calls."
+      }
+    },
+    "required": [
+      "cloudId",
+      "issueIdOrKey"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

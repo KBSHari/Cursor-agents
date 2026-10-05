@@ -1,0 +1,18 @@
+{
+  "name": "create_repo",
+  "description": "Creates the folder and runs `git init` outside the sandbox. Use this instead of shell `git init`, which the sandbox blocks. Ask the user where the repo should go if they did not say.",
+  "arguments": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "path": {
+        "type": "string",
+        "description": "Absolute path where the new repository should be created (e.g. \"/Users/name/code/my-new-app\")"
+      }
+    },
+    "required": [
+      "path"
+    ],
+    "additionalProperties": false
+  }
+}

@@ -1,0 +1,322 @@
+{
+  "mode": "catalog",
+  "namespaces": [
+    {
+      "namespace": "cursor",
+      "namespaceDescription": "Native Cursor tools for this session. These are highly recommended and useful tools that you should use when the right situation arises. Don't be afraid to look at one if it seems relev... [truncated]",
+      "tools": [
+        {
+          "tool": "AwaitShell",
+          "description": "Check or poll a backgrounded shell job. For work that does not have a shell id, you can omit the shell_id arg to sleep for the full `block_until_ms` duration (prefer this over sleeping ... [truncated]"
+        },
+        {
+          "tool": "ConnectScm",
+          "description": "Offer the user a Connect GitHub prompt when source-control access would unblock the task, such as reviewing pull requests, opening pull requests, or acting on a repository. The user may... [truncated]"
+        },
+        {
+          "tool": "CreateGoal",
+          "description": "Create a long-running goal. Only use this tool when explicitly requested by the user; NEVER use this tool for ordinary tasks."
+        },
+        {
+          "tool": "Delete",
+          "description": "Deletes a file at the specified path. The operation will fail gracefully if: - The file doesn't exist - The operation is rejected for security reasons - The file cannot be deleted"
+        },
+        {
+          "tool": "EditNotebook",
+          "description": "Use this tool to edit a jupyter notebook cell. Cell indices are 0-based. 'old_string' and 'new_string' should be a valid cell content, i.e. WITHOUT any JSON syntax that notebook files u... [truncated]"
+        },
+        {
+          "tool": "FetchMcpResource",
+          "description": "Reads a specific resource from an MCP server, identified by server name and resource URI. Optionally, set downloadPath (relative to the workspace) to save the resource to disk; when set... [truncated]"
+        },
+        {
+          "tool": "GenerateImage",
+          "description": "Generate an image file from a text description. STRICT INVOCATION RULES (must follow): - Only use this tool when the user explicitly asks for an image. Do not generate images \"just to b... [truncated]"
+        },
+        {
+          "tool": "ReadLints",
+          "description": "Read and display linter errors from the current workspace. You can provide paths to specific files or directories, or omit the argument to get diagnostics for all files."
+        },
+        {
+          "tool": "SwitchMode",
+          "description": "Switch the interaction mode to better match the current task. Each mode is optimized for a specific type of work. ## When to Switch Modes Switch modes proactively when: 1. **Task type c... [truncated]"
+        },
+        {
+          "tool": "Task",
+          "description": "Launch a new agent to handle complex, multi-step tasks autonomously. The Task tool launches specialized subagents (subprocesses) that autonomously handle complex tasks. Each subagent_ty... [truncated]"
+        },
+        {
+          "tool": "TodoWrite",
+          "description": "Use this tool to create and manage a structured task list for your current coding session."
+        },
+        {
+          "tool": "UpdateGoal",
+          "description": "Update the existing goal's status. Set status to `complete` only when the objective has actually been achieved and no required work remains, unless the user explicitly requests to stop ... [truncated]"
+        },
+        {
+          "tool": "WebFetch",
+          "description": "Fetch content from a specified URL and return its contents in a readable markdown format. Use this tool when you need to retrieve and analyze web content."
+        },
+        {
+          "tool": "WebSearch",
+          "description": "Search web for real-time info on any topic; use for up-to-date facts not in training data, like current events or tech updates. Results include snippets and URLs."
+        }
+      ]
+    },
+    {
+      "namespace": "cursor-ide-browser",
+      "namespaceStatus": "ready",
+      "namespaceDescription": "The cursor-ide-browser MCP server provides a Cursor-owned browser tab plus a raw Chrome DevTools Protocol command tool. CORE WORKFLOW: 1. Start by understanding the user's goal and what... [truncated]",
+      "tools": [
+        {
+          "tool": "browser_cdp",
+          "description": "Send a Chrome DevTools Protocol command to the target browser tab. Do not use CDP Input.* methods; use dedicated browser tools for clicks, text input, key presses, scrolling, and drag-a... [truncated]"
+        },
+        {
+          "tool": "browser_click",
+          "description": "Click an element by ref from browser_snapshot. Use this instead of CDP Input.* methods."
+        },
+        {
+          "tool": "browser_drag",
+          "description": "Drag an element by ref to another ref or viewport coordinates."
+        },
+        {
+          "tool": "browser_fill",
+          "description": "Set the value of an input, textarea, or contenteditable element by ref."
+        },
+        {
+          "tool": "browser_get_bounding_box",
+          "description": "Get the viewport bounding box for an element ref."
+        },
+        {
+          "tool": "browser_highlight",
+          "description": "Highlight an element by ref in the browser page for visual grounding."
+        },
+        {
+          "tool": "browser_lock",
+          "description": "Lock or unlock the browser to control whether the user can interact while you work. Set action to \"lock\" or \"unlock\". When locked, the user can still click \"Take Control\" to unlock if needed."
+        },
+        {
+          "tool": "browser_mouse_click_xy",
+          "description": "Click at viewport coordinates. Prefer browser_click with refs when possible."
+        },
+        {
+          "tool": "browser_navigate",
+          "description": "Navigate to a URL. By default reuses an existing tab; set newTab: true to open in a new tab."
+        },
+        {
+          "tool": "browser_press_key",
+          "description": "Press a key in the browser page using DOM keyboard events."
+        },
+        {
+          "tool": "browser_scroll",
+          "description": "Scroll the page, a scrollable container, or an element into view. Use this instead of CDP Input.* wheel events."
+        },
+        {
+          "tool": "browser_select_option",
+          "description": "Select one or more options in a select element by ref."
+        },
+        {
+          "tool": "browser_snapshot",
+          "description": "Capture accessibility snapshot of the current page, this is better than screenshot"
+        },
+        {
+          "tool": "browser_tabs",
+          "description": "List, create, close, or select a browser tab"
+        },
+        {
+          "tool": "browser_take_screenshot",
+          "description": "Take a screenshot of the current page. You can't perform actions based on the screenshot, use browser_snapshot for actions."
+        },
+        {
+          "tool": "browser_type",
+          "description": "Type text into an input, textarea, or contenteditable element by ref."
+        }
+      ]
+    },
+    {
+      "namespace": "cursor-origin-readonly",
+      "namespaceStatus": "ready",
+      "namespaceDescription": "Cursor Origin (origin.cursor.com) is a git host. These tools only see repositories hosted on Origin, addressed by their Origin namespace (owner) and repository name. A repository that o... [truncated]",
+      "tools": [
+        {
+          "tool": "checks_read",
+          "description": "Read checks for one target in an Origin-hosted repository: a pull request, commit, suite, or run. Rollup covers materialized check runs on the current page only and is omitted when next... [truncated]"
+        },
+        {
+          "tool": "commit_read",
+          "description": "Read one commit in an Origin-hosted repository. Choose a single view: metadata, files, or a bounded patch."
+        },
+        {
+          "tool": "compare_commits",
+          "description": "Compare two refs of an Origin-hosted repository relative to their merge base."
+        },
+        {
+          "tool": "get_file_contents",
+          "description": "Read one path at a ref in an Origin-hosted repository. Files larger than the byte cap are truncated. A directory returns type dir and its immediate children as entries (name, path, type... [truncated]"
+        },
+        {
+          "tool": "get_git_tree",
+          "description": "List a git tree in an Origin-hosted repository at a tree SHA, commit SHA, branch, tag, or HEAD: immediate children by default, or the full walk with recursive true. Each entry is path, ... [truncated]"
+        },
+        {
+          "tool": "get_repository",
+          "description": "Get one Origin repository by owner and name, including default branch and mirror state."
+        },
+        {
+          "tool": "grep_contents",
+          "description": "Search file contents across one Origin-hosted repository at a ref, which defaults to the default branch. The query is a regular expression matched case-sensitively; set literal for exac... [truncated]"
+        },
+        {
+          "tool": "list_branches",
+          "description": "List branch names and tip commit SHAs for an Origin-hosted repository. Optional prefix filters each page after pagination."
+        },
+        {
+          "tool": "list_commits",
+          "description": "List commits from a branch or starting ref in an Origin-hosted repository, optionally filtered by lists of exact git author or committer emails and by inclusive since and until bounds o... [truncated]"
+        },
+        {
+          "tool": "list_namespaces",
+          "description": "List the Origin namespaces (owner slugs) the caller can list repositories in, ordered by slug. Each slug is a valid owner for list_repositories; viewerCanCreateRepositories reports whet... [truncated]"
+        },
+        {
+          "tool": "list_pull_requests",
+          "description": "List pull requests in an Origin-hosted repository, filtered by state, head, author, base, or direction and sorted by creation or update time. Items are compact summaries (author, timest... [truncated]"
+        },
+        {
+          "tool": "list_repositories",
+          "description": "List Origin repositories belonging to an owner slug."
+        },
+        {
+          "tool": "mcp_auth",
+          "description": "Authenticate this MCP server so its tools can be used."
+        },
+        {
+          "tool": "pull_request_read",
+          "description": "Read one Origin-hosted pull request through a single view: summary, files, commits, reviews, comments, or threads. Summary includes labels, requested reviewers, and stack membership (st... [truncated]"
+        }
+      ]
+    },
+    {
+      "namespace": "plugin-exa-exa",
+      "namespaceStatus": "needsAuth",
+      "namespaceError": "This MCP server requires authentication before its tools can be used.",
+      "tools": [
+        {
+          "tool": "mcp_auth",
+          "description": "Authenticate this MCP server so its tools can be used."
+        }
+      ]
+    },
+    {
+      "namespace": "user-Playwright",
+      "namespaceStatus": "ready",
+      "tools": [
+        {
+          "tool": "browser_click",
+          "description": "Perform click on a web page"
+        },
+        {
+          "tool": "browser_close",
+          "description": "Close the page"
+        },
+        {
+          "tool": "browser_console_messages",
+          "description": "Returns all console messages"
+        },
+        {
+          "tool": "browser_drag",
+          "description": "Perform drag and drop between two elements"
+        },
+        {
+          "tool": "browser_drop",
+          "description": "Drop files or MIME-typed data onto an element, as if dragged from outside the page. At least one of \"paths\" or \"data\" must be provided."
+        },
+        {
+          "tool": "browser_emulate_media",
+          "description": "Emulate CSS media features for the page, for example switch between the light and dark color scheme. Omitted parameters are left unchanged; null clears an override."
+        },
+        {
+          "tool": "browser_evaluate",
+          "description": "Evaluate JavaScript expression on page or element"
+        },
+        {
+          "tool": "browser_file_upload",
+          "description": "Upload one or multiple files"
+        },
+        {
+          "tool": "browser_fill_form",
+          "description": "Fill multiple form fields"
+        },
+        {
+          "tool": "browser_find",
+          "description": "Search the accessibility snapshot of the current page for text or a regular expression. Returns matching snapshot nodes with a few lines of surrounding context (like search snippets), e... [truncated]"
+        },
+        {
+          "tool": "browser_handle_dialog",
+          "description": "Handle a dialog"
+        },
+        {
+          "tool": "browser_hover",
+          "description": "Hover over element on page"
+        },
+        {
+          "tool": "browser_navigate",
+          "description": "Navigate to a URL"
+        },
+        {
+          "tool": "browser_navigate_back",
+          "description": "Go back to the previous page in the history"
+        },
+        {
+          "tool": "browser_network_request",
+          "description": "Returns full details (headers and body) of a single network request, or a single part if `part` is set. Use the number from browser_network_requests."
+        },
+        {
+          "tool": "browser_network_requests",
+          "description": "Returns a numbered list of network requests since loading the page. Use browser_network_request with the number to get full details."
+        },
+        {
+          "tool": "browser_press_key",
+          "description": "Press a key on the keyboard"
+        },
+        {
+          "tool": "browser_resize",
+          "description": "Resize the browser window"
+        },
+        {
+          "tool": "browser_run_code_unsafe",
+          "description": "Run a Playwright code snippet. Unsafe: executes arbitrary JavaScript in the Playwright server process and is RCE-equivalent."
+        },
+        {
+          "tool": "browser_select_option",
+          "description": "Select an option in a dropdown"
+        },
+        {
+          "tool": "browser_snapshot",
+          "description": "Capture accessibility snapshot of the current page, this is better than screenshot"
+        },
+        {
+          "tool": "browser_tabs",
+          "description": "List, create, close, or select a browser tab."
+        },
+        {
+          "tool": "browser_take_screenshot",
+          "description": "Take a screenshot of the current page. You can't perform actions based on the screenshot, use browser_snapshot for actions."
+        },
+        {
+          "tool": "browser_type",
+          "description": "Type text into editable element"
+        },
+        {
+          "tool": "browser_wait_for",
+          "description": "Wait for text to appear or disappear or a specified time to pass"
+        },
+        {
+          "tool": "mcp_auth",
+          "description": "Authenticate this MCP server so its tools can be used."
+        }
+      ]
+    }
+  ]
+}

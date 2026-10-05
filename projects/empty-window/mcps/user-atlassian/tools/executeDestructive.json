@@ -1,0 +1,42 @@
+{
+  "name": "executeDestructive",
+  "description": "Run a destructive Atlassian operation by name (deletes or irreversibly changes data) across all Atlassian products.\nOnly use an operation name from discover results or one already in your tool list; never guess, assume, or invent a name — when unsure, call discover first.\nIf the user provides a Jira/Confluence URL, pass it directly as cloudId — no need to call getAccessibleAtlassianResources.\nPass all inputs as a flat object — the server routes each to the right location (path, query, or body) automatically.\nUse responseFields for field filtering, e.g. [\"key\",\"fields.summary\",\"fields.status.name\"].\nUse view to select a named output preset (e.g. \"compact\", \"evidence\", \"full\") when the operation supports views.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "cloudId": {
+        "type": "string",
+        "description": "Site UUID or Jira/Confluence URL for this operation's Atlassian site. cloudId is never silently auto-resolved or reused for you — call getAccessibleAtlassianResources ONCE per session, cache the returned cloudId, and pass it explicitly on this and every subsequent call, since most operations need it. `execute` and its read/write/destructive variants strictly require it for cloudId-scoped operations and fail without it. Not needed for cloudId-less operations (e.g. Bitbucket), which ignore this field."
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512,
+        "description": "Operation name to run. Only use an operation name from discover results or one already in your tool list; never guess, assume, or invent a name — when unsure, call discover first."
+      },
+      "inputs": {
+        "type": "object",
+        "additionalProperties": {},
+        "description": "Flat input object — pass all parameters here. The server routes each to path, query, or body automatically."
+      },
+      "responseFields": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "maxItems": 50,
+        "description": "Dot-notation fields to return, e.g. [\"key\",\"fields.summary\"]. Filters response."
+      },
+      "view": {
+        "type": "string",
+        "description": "Named output view preset (e.g. \"compact\", \"evidence\", \"full\"). Only applies when the operation declares views. Overridden by responseFields if both are supplied."
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

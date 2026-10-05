@@ -1,0 +1,19 @@
+{
+  "name": "discover",
+  "description": "Find Atlassian operations that are not already in your tool list. Searches ~316 operations across Jira, Confluence, Compass, Bitbucket, Focus, Goals, Projects, Loom, Talent, Teams, Capacity-planning, Assets. Returns up to 5 matches with the exact name and inputs needed to call the matching execute-family tool (executeRead, executeWrite, or executeDestructive), then a briefer name-and-summary list of further matches — re-query with narrower terms to get one of those in full. Read all 5 before choosing. Only use an operation name from discover results or one already in your tool list; never guess, assume, or invent a name — when unsure, call discover first.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "minLength": 1,
+        "description": "What you want to do, as a verb plus the object and, if you know it, the product: \"transition a jira issue\", \"list confluence spaces\", \"get pull request comments\". Naming the product scopes the searchAsk for one thing per call; for a goal spanning two products, call discover once per product. If nothing fits, re-query using the product's own noun (issue, page, space, repository, sprint) rather than a synonym."
+      }
+    },
+    "required": [
+      "query"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

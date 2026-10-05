@@ -1,0 +1,73 @@
+{
+  "name": "updateConfluenceContent",
+  "description": "Update Confluence docs, whiteboards, or databases.\n\nBefore choosing body.format or authoring an edit, call getContentFormatGuide through execute with\nname=getContentFormatGuide and inputs={toolName}. Use updateConfluencePage\nfor pages, blog posts, and live docs; updateConfluenceWhiteboard for\nwhiteboards; or updateConfluenceDatabase for databases.\n\nSpace instructions describe how to author content in a Confluence space.\nApply relevant guidance to the content you create or update. Follow this\ndecision rule:\n1. Before authoring, call getConfluenceSpace for the target space unless\n   getConfluenceContent returned metadata.hasSpaceInstructions=false for\n   content in that space. If getConfluenceSpace already returned for the\n   same cloudId and space during the current task, reuse its\n   spaceInstructions and do not call it again.\n2. When the value is true or unknown and instructions have not been\n   loaded, you must call getConfluenceSpace once before authoring through\n   execute with name=getConfluenceSpace, top-level cloudId, and\n   inputs={spaceIdOrKey}.\n3. Apply any returned spaceInstructions. If a successful response omits\n   them, no instructions are configured; author with defaults and do not\n   block.\n\nAfter a successful getConfluenceSpace call, do not make a separate\ngetConfluenceSpaceInstructions call.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "cloudId": {
+        "type": "string",
+        "description": "Site UUID or Jira/Confluence URL for this operation's Atlassian site. cloudId is never silently auto-resolved or reused for you — call getAccessibleAtlassianResources ONCE per session, cache the returned cloudId, and pass it explicitly on this and every subsequent call, since most operations need it. `execute` and its read/write/destructive variants strictly require it for cloudId-scoped operations and fail without it. Not needed for cloudId-less operations (e.g. Bitbucket), which ignore this field."
+      },
+      "contentId": {
+        "type": "string",
+        "description": "Numeric Confluence content ID. One of contentId or contentUrl is required.\n"
+      },
+      "contentUrl": {
+        "type": "string",
+        "description": "Full URL of the Confluence content. One of contentId or contentUrl is required.\nClear Confluence URLs for pages/live docs (/pages/{id}), blogs\n(/blog/{id}), whiteboards (/whiteboard/{id}), databases\n(/database/{id}), and folders (/folder/{id}) are normalized to their\nnumeric content ID before the update is sent, so URLs copied from the\nproduct should work directly.\n"
+      },
+      "snapshotToken": {
+        "type": "string",
+        "description": "Opaque token from a prior getConfluenceContent response. Required for doc-type\nupdates that mutate page/blog/live_doc content or contentWidth. Not used for whiteboard svg or\ndatabase csv object updates.\n"
+      },
+      "title": {
+        "type": "string",
+        "description": "New title for the content. 1-255 characters. Omit to keep existing title."
+      },
+      "body": {
+        "type": "object",
+        "additionalProperties": {},
+        "description": "Before composing this body, follow the space-instruction decision rule in the tool\ndescription. Reuse known instruction state and do not repeat the space lookup per write.\nBody update object with format and value. Doc types accept format html or\nmarkdown. Markdown is for simple text; when richer structure would improve the\ndocument, re-read it as HTML and preserve existing rich content in the HTML update.\nWhiteboards accept format svg and should include\ncontext.content with the current SVG when applying a patch. Databases\naccept format csv and should include context.content with the current\nCSV when applying an edit envelope. Put the raw patch/envelope directly in\nvalue; do not wrap it in an extra JSON object or {\"content\": \"...\"}\nwrapper. For whiteboards, value is a patch, not a full SVG replacement.\nFor databases, value is an edit envelope, not a create payload. Mutually\nexclusive with edits.\n"
+      },
+      "edits": {
+        "type": "array",
+        "items": {},
+        "description": "Granular edit operations. Array of tool-call objects, each with name\n(replaceNode, insertNodeAfter, insertNodeBefore, deleteNode, removeNodes,\nmoveNode, appendNodeToEnd, setAttrs), localId, value, and arguments.\nMutually exclusive with body.\n"
+      },
+      "dryRun": {
+        "type": "boolean",
+        "description": "If true, validate and preview the result without persisting. For edits,\nreturns the resulting HTML. For body replacement, echoes the input.\n"
+      },
+      "draft": {
+        "type": "boolean",
+        "description": "If true, update the draft version instead of current. Only supported\nfor page and blogpost doc edits.\n"
+      },
+      "versionMessage": {
+        "type": "string",
+        "description": "Optional version comment/message for the content update."
+      },
+      "minorEdit": {
+        "type": "boolean",
+        "description": "Whether to mark the new content version as a minor edit."
+      },
+      "ownerId": {
+        "type": "string",
+        "description": "Atlassian account ID of the new owner to transfer page ownership to. Optional.\nThis is an account ID (e.g. 5b10ac8d82e05b22cc7d4ef5), never an email/username\nor a content ID. The new owner must already have edit permission.\n"
+      },
+      "contentWidth": {
+        "type": "string",
+        "enum": [
+          "narrow",
+          "wide",
+          "max"
+        ],
+        "description": "Optional page width for doc types only: page, live_doc, and blogpost.\nAccepted values are narrow, wide, and max. The default width is narrow.\nOmit to keep the existing content width unchanged.\nA width-only update is valid and requires snapshotToken, but does not\nrequire title, body, or edits.\nNon-doc content types do not support this field.\n"
+      }
+    },
+    "required": [
+      "cloudId"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

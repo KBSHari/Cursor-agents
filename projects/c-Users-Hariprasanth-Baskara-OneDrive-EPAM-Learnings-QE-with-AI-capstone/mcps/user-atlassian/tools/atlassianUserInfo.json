@@ -1,0 +1,8 @@
+{
+  "name": "atlassianUserInfo",
+  "description": "Returns the accountId of the current user",
+  "arguments": {
+    "type": "object",
+    "properties": {}
+  }
+}

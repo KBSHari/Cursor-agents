@@ -1,0 +1,1 @@
+Cursor Origin (origin.cursor.com) is a git host. These tools only see repositories hosted on Origin, addressed by their Origin namespace (owner) and repository name. A repository that only mirrors to Origin still counts as Origin-hosted.

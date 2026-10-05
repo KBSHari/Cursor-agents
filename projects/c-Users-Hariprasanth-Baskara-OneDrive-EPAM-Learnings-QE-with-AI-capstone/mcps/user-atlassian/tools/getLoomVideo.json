@@ -1,0 +1,71 @@
+{
+  "name": "getLoomVideo",
+  "description": "Reads a Loom video's core metadata and optionally its transcript, comments, AI agent briefs, AI-extracted meeting action items, or attached links in one call via the expand input.\nUSE WHEN the user asks about a specific Loom video — its title, description, duration, owner, view/comment/reaction counts, what was said in it (pass expand: [\"transcript\"]), what feedback or comments people left on it (pass expand: [\"comments\"]), what the AI summarised as key points (pass expand: [\"agentBriefs\"]), or what follow-up tasks or action items the AI extracted from a meeting recording (pass expand: [\"meetingActionItems\"]), or which links are attached to it (pass expand: [\"links\"]).\nDO NOT USE to get the downloadable MP4 file — use getLoomVideoDownloadUrl for that. To find a video's ARI first, use listLoomVideos or listLoomVideosSharedWithMe.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "cloudId": {
+        "type": "string",
+        "description": "Site UUID or Jira/Confluence URL for this operation's Atlassian site. cloudId is never silently auto-resolved or reused for you — call getAccessibleAtlassianResources ONCE per session, cache the returned cloudId, and pass it explicitly on this and every subsequent call, since most operations need it. `execute` and its read/write/destructive variants strictly require it for cloudId-scoped operations and fail without it. Not needed for cloudId-less operations (e.g. Bitbucket), which ignore this field."
+      },
+      "videoAri": {
+        "type": "string",
+        "description": "ARI of the Loom video, formatted as ari:cloud:loom:{siteId}:video/activation/{activationId}/{videoId}. Provide this or videoUrl."
+      },
+      "videoUrl": {
+        "type": "string",
+        "description": "Loom share URL for the video, for example https://www.loom.com/share/{videoId}. Used when videoAri is not supplied; a supporting action resolves the URL to an ARI."
+      },
+      "expand": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "transcript",
+            "comments",
+            "agentBriefs",
+            "meetingActionItems",
+            "links"
+          ]
+        },
+        "maxItems": 5,
+        "description": "Optional list of extra data to include in the response, in addition to core metadata. Any subset of \"transcript\", \"comments\", \"agentBriefs\", \"meetingActionItems\", \"links\". Omit for core metadata only — nothing is included by default."
+      },
+      "transcriptFormat": {
+        "type": "string",
+        "enum": [
+          "text",
+          "phrases",
+          "both"
+        ],
+        "description": "Transcript response shape when expand includes \"transcript\". Use \"text\" for summaries, extraction, implementation instructions, and general \"what was said\" questions. Use \"phrases\" only when timestamps, speaker/chunk structure, or quote-to-time answers are needed. Use \"both\" only when the caller explicitly needs both representations.",
+        "default": "text"
+      },
+      "commentsFirst": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 100,
+        "description": "Maximum number of comments to return when comments is included via expand (1-100)."
+      },
+      "commentsAfter": {
+        "type": "string",
+        "description": "Pagination cursor to fetch the next page of comments when comments is included via expand."
+      },
+      "linksFirst": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50,
+        "description": "Maximum number of links to return when links is included via expand (1-50)."
+      },
+      "linksAfter": {
+        "type": "string",
+        "description": "Pagination cursor to fetch the next page of links when links is included via expand."
+      }
+    },
+    "required": [
+      "cloudId"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

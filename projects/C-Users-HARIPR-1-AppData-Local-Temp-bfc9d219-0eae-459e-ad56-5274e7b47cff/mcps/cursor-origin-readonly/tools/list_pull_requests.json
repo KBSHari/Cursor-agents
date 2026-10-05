@@ -1,0 +1,53 @@
+{
+  "name": "list_pull_requests",
+  "description": "List pull requests in an Origin-hosted repository, filtered by state, head, author, base, or direction and sorted by creation or update time. Items are compact summaries (author, timestamps, merged/closedAt/mergedAt, and stack membership when the pull request is stacked); they omit body and diff stats—use pull_request_read for those. Continuation calls must resend those filters with pageToken.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "owner": {
+        "type": "string",
+        "description": "Origin namespace (owner) slug"
+      },
+      "name": {
+        "type": "string",
+        "description": "Origin repository name within that namespace"
+      },
+      "state": {
+        "type": "string",
+        "description": "open (default), closed, or all"
+      },
+      "head": {
+        "type": "string",
+        "description": "Head branch"
+      },
+      "author": {
+        "type": "string",
+        "description": "Actor id (user_…, app_…, or sa_…)"
+      },
+      "base": {
+        "type": "string",
+        "description": "Base branch, short name or refs/heads/…"
+      },
+      "direction": {
+        "type": "string",
+        "description": "desc (default) or asc"
+      },
+      "sortBy": {
+        "type": "string",
+        "description": "created (default) or updated"
+      },
+      "pageSize": {
+        "type": "number"
+      },
+      "pageToken": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "owner",
+      "name"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

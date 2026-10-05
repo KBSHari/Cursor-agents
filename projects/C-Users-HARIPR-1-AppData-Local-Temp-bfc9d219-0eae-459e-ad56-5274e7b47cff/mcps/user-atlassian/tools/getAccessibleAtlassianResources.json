@@ -1,0 +1,8 @@
+{
+  "name": "getAccessibleAtlassianResources",
+  "description": "Returns the cloudId(s) available to the current user",
+  "arguments": {
+    "type": "object",
+    "properties": {}
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "searchConfluence",
+  "description": "Search Confluence content with CQL",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "cloudId": {
+        "type": "string",
+        "description": "Site UUID or Jira/Confluence URL for this operation's Atlassian site. cloudId is never silently auto-resolved or reused for you — call getAccessibleAtlassianResources ONCE per session, cache the returned cloudId, and pass it explicitly on this and every subsequent call, since most operations need it. `execute` and its read/write/destructive variants strictly require it for cloudId-scoped operations and fail without it. Not needed for cloudId-less operations (e.g. Bitbucket), which ignore this field."
+      },
+      "cql": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "description": "CQL query string (max 4096 chars). Examples:\n`type = page AND space = \"DEV\"`,\n`title ~ \"onboarding\" AND lastmodified > \"2025-01-01\"`,\n`creator = currentUser() AND type IN (page, blogpost) ORDER BY lastmodified DESC`.\n"
+      },
+      "cqlcontext": {
+        "type": "string",
+        "description": "JSON-encoded execution context, e.g. {\"spaceKey\":\"DEV\"}. Restricts the search to the supplied scope."
+      },
+      "expand": {
+        "type": "string",
+        "description": "Comma-separated list of content properties to expand on each result.\nCommon values: `space`, `version`, `body.view`, `metadata.labels`,\n`ancestors`. Use sparingly to avoid large responses.\n"
+      },
+      "limit": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 100,
+        "description": "Max number of results to return per page (1-100). Defaults to 25."
+      },
+      "cursor": {
+        "type": "string",
+        "description": "Opaque pagination cursor returned by a previous call. Omit to start from the first page."
+      }
+    },
+    "required": [
+      "cloudId",
+      "cql"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

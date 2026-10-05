@@ -1,0 +1,70 @@
+{
+  "name": "searchJiraIssuesUsingJql",
+  "description": "Search for Jira issues using JQL, with an optional approximate count. Use view: \"evidence\" to fetch and map custom fields. Page with nextPageToken until isLast is true. For one known issue, use getJiraIssue. JQL only returns issues; inferring anything else from issue rows is silently incomplete. Use the purpose-built operation for sprints, boards, board config, field history, worklogs, releases, accountIds, issue types, projects and statuses.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "cloudId": {
+        "type": "string",
+        "description": "Site UUID or Jira/Confluence URL for this operation's Atlassian site. cloudId is never silently auto-resolved or reused for you — call getAccessibleAtlassianResources ONCE per session, cache the returned cloudId, and pass it explicitly on this and every subsequent call, since most operations need it. `execute` and its read/write/destructive variants strictly require it for cloudId-scoped operations and fail without it. Not needed for cloudId-less operations (e.g. Bitbucket), which ignore this field."
+      },
+      "jql": {
+        "type": "string",
+        "description": "JQL query string e.g. \"project = PROJ AND status = 'In Progress'\". If the tool returns a repairHint, follow it and retry.\n"
+      },
+      "searchResultMode": {
+        "type": "string",
+        "enum": [
+          "issues",
+          "count",
+          "all"
+        ],
+        "description": "Default \"issues\". Never count for normal search or if nextPageToken used. If total for same query is known, reuse it. Use \"count\" only when no trusted count exists and either the user asks or a downstream step needs it. Use \"all\" only if both count and issues required.\n"
+      },
+      "maxResults": {
+        "type": "number",
+        "description": "Maximum results to return (default 50, max 100)"
+      },
+      "fields": {
+        "type": "array",
+        "items": {},
+        "description": "Fields per issue (e.g. [\"summary\", \"status\", \"customfield_10010\"]). customfield_* IDs are site-specific — discover the correct id for story points etc. on this Cloud site. Honoured exactly when supplied. Values map to issues[].fields.customFields (human labels), not raw customfield_* keys. The default \"compact\" view omits custom fields; use view: \"evidence\" for velocity/sprint JQL (fetches and maps all custom fields) or pass explicit customfield_* IDs.\n"
+      },
+      "nextPageToken": {
+        "type": "string",
+        "description": "Pagination token from a previous response to fetch the next page"
+      },
+      "responseContentFormat": {
+        "type": "string",
+        "enum": [
+          "markdown",
+          "html"
+        ],
+        "description": "Format for rich-text bodies (description, environment, comments) when the view returns them. Defaults to markdown; html is lossless for a later editJiraIssue. Issues holding anything markdown cannot represent (media, panels, expands, statuses, @mentions) are returned as HTML automatically, decided per issue. An explicit markdown request is overridden for those bodies, with a warning saying so; appliedContentFormat in the response reports the format you actually got.\n"
+      },
+      "actionSource": {
+        "type": "string",
+        "enum": [
+          "jira_mcp_card",
+          "model_tool_call"
+        ],
+        "description": "Optional invocation attribution. Jira MCP cards set jira_mcp_card; omit for model/tool-loop calls."
+      },
+      "view": {
+        "type": "string",
+        "enum": [
+          "compact",
+          "evidence",
+          "full"
+        ],
+        "description": "Output view preset. Default: \"compact\". Options: \"compact\", \"evidence\", \"full\". compact = minimal fields for scanning; evidence = decision-relevant detail; full = complete response."
+      }
+    },
+    "required": [
+      "cloudId",
+      "jql"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}
