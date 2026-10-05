@@ -1,5 +1,17 @@
 ﻿# Cursor-agents
 
-Repository for Cursor agent deliveries.
+Hari-Agents static welcome page.
 
-See open pull requests for in-progress work.
+## Open the page
+
+Open `index.html` in a browser (file open is enough; no server required).
+
+## Tests
+
+```text
+node --test welcome-page.test.mjs
+```
+
+## Related
+
+- Jira: [SCRUM-62](https://epam-team-v1cb1mzz.atlassian.net/browse/SCRUM-62)
