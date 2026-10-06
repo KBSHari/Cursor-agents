@@ -1,0 +1,63 @@
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background: #ffffff;
+  color: #1a1a1a;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  box-sizing: border-box;
+  padding: 1.5rem 1.25rem;
+}
+
+main {
+  width: 100%;
+  max-width: 40rem;
+}
+
+h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 1rem;
+}
+
+.search-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.search-cluster label {
+  flex: 1 0 100%;
+  font-size: 1rem;
+}
+
+.search-cluster input {
+  flex: 1 1 12rem;
+  min-width: 0;
+  box-sizing: border-box;
+  font: inherit;
+  color: inherit;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #1a1a1a;
+  background: #ffffff;
+}
+
+.search-cluster button {
+  flex: 0 0 auto;
+  font: inherit;
+  color: #1a1a1a;
+  background: #ffffff;
+  border: 1px solid #1a1a1a;
+  padding: 0.5rem 0.85rem;
+  cursor: pointer;
+}
+
+#search-results {
+  margin: 1rem 0 0;
+  padding-left: 1.25rem;
+}
